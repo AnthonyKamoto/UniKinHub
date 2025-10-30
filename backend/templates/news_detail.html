@@ -1,0 +1,379 @@
+{% extends 'base.html' %} {% load static %} {% block title %}{{ news.title }} -
+Actualités Étudiantes Kinshasa{% endblock %} {% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <!-- Article principal -->
+        <article class="card">
+            {% if news.image %}
+            <img
+                src="{{ news.image.url }}"
+                class="card-img-top"
+                style="height: 300px; object-fit: cover"
+                alt="{{ news.title }}"
+            />
+            {% endif %}
+
+            <div class="card-body">
+                <!-- En-tête -->
+                <div
+                    class="d-flex justify-content-between align-items-start mb-3"
+                >
+                    <span
+                        class="badge fs-6"
+                        style="background-color: {{ news.category.color }};"
+                    >
+                        {{ news.category.name }}
+                    </span>
+
+                    {% if news.importance == 'urgent' %}
+                    <span class="badge bg-danger fs-6">URGENT</span>
+                    {% elif news.importance == 'high' %}
+                    <span class="badge bg-warning text-dark fs-6">ÉLEVÉE</span>
+                    {% elif news.importance == 'medium' %}
+                    <span class="badge bg-info fs-6">MOYENNE</span>
+                    {% else %}
+                    <span class="badge bg-secondary fs-6">FAIBLE</span>
+                    {% endif %}
+                </div>
+
+                <!-- Titre -->
+                <h1 class="card-title">{{ news.title }}</h1>
+
+                <!-- Métadonnées -->
+                <div class="border-bottom pb-3 mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>
+                                <strong>Auteur :</strong> {{
+                                news.author.get_full_name|default:news.author.username
+                                }}
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>
+                                <strong>Publié le :</strong> {{
+                                news.publish_date|date:"d/m/Y à H:i" }}
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <i class="fas fa-eye me-1"></i>
+                                <strong>Vues :</strong> {{ news.views_count }}
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <i class="fas fa-heart me-1"></i>
+                                <strong>J'aime :</strong> {{ news.likes_count }}
+                            </small>
+                        </div>
+                    </div>
+
+                    {% if news.target_universities %}
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-university me-1"></i>
+                            <strong>Universités ciblées :</strong> {{
+                            news.target_universities|join:", " }}
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Contenu -->
+                <div class="content">{{ news.content|linebreaks }}</div>
+
+                <!-- Actions -->
+                <div class="mt-4 pt-3 border-top">
+                    {% if user.is_authenticated %}
+                    <button
+                        class="btn btn-outline-danger like-btn"
+                        data-news-id="{{ news.id }}"
+                        data-liked="false"
+                    >
+                        <i class="fas fa-heart me-1"></i>J'aime ({{
+                        news.likes_count }})
+                    </button>
+
+                    <button
+                        class="btn btn-outline-primary ms-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#shareModal"
+                    >
+                        <i class="fas fa-share me-1"></i>Partager
+                    </button>
+                    {% endif %} {% if user.is_authenticated and user.role in
+                    'publisher,admin' and user == news.author %}
+                    <a
+                        href="{% url 'web:edit_news' news.id %}"
+                        class="btn btn-outline-warning ms-2"
+                    >
+                        <i class="fas fa-edit me-1"></i>Modifier
+                    </a>
+                    {% endif %}
+
+                    <a
+                        href="{% url 'web:home' %}"
+                        class="btn btn-outline-secondary ms-auto"
+                    >
+                        <i class="fas fa-arrow-left me-1"></i>Retour à l'accueil
+                    </a>
+                </div>
+            </div>
+        </article>
+
+        <!-- Commentaires -->
+        {% if user.is_authenticated %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-comments me-1"></i>Commentaires</h5>
+            </div>
+            <div class="card-body">
+                <!-- Formulaire de commentaire -->
+                <form
+                    method="post"
+                    action="{% url 'web:add_comment' news.id %}"
+                >
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <textarea
+                            class="form-control"
+                            name="content"
+                            rows="3"
+                            placeholder="Laissez votre commentaire..."
+                            required
+                        ></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-1"></i>Commenter
+                    </button>
+                </form>
+
+                <!-- Liste des commentaires -->
+                <div class="mt-4">
+                    {% for comment in comments %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <div
+                            class="d-flex justify-content-between align-items-start"
+                        >
+                            <div>
+                                <strong
+                                    >{{
+                                    comment.author.get_full_name|default:comment.author.username
+                                    }}</strong
+                                >
+                                <small class="text-muted ms-2"
+                                    >{{ comment.created_at|date:"d/m/Y à H:i"
+                                    }}</small
+                                >
+                            </div>
+                        </div>
+                        <p class="mt-2 mb-0">
+                            {{ comment.content|linebreaks }}
+                        </p>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center py-3">
+                        <i class="fas fa-comment-slash me-1"></i>
+                        Aucun commentaire pour le moment. Soyez le premier à
+                        commenter !
+                    </p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+        <!-- Actualités similaires -->
+        <div class="card">
+            <div class="card-header">
+                <h5>
+                    <i class="fas fa-newspaper me-1"></i>Actualités Similaires
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for similar in similar_news %}
+                <div class="d-flex mb-3">
+                    {% if similar.image %}
+                    <img
+                        src="{{ similar.image.url }}"
+                        class="me-3"
+                        style="width: 60px; height: 60px; object-fit: cover"
+                        alt="{{ similar.title }}"
+                    />
+                    {% else %}
+                    <div
+                        class="me-3 bg-light d-flex align-items-center justify-content-center"
+                        style="width: 60px; height: 60px"
+                    >
+                        <i class="fas fa-newspaper text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">
+                            <a
+                                href="{% url 'web:news_detail' similar.id %}"
+                                class="text-decoration-none"
+                            >
+                                {{ similar.title|truncatechars:50 }}
+                            </a>
+                        </h6>
+                        <small class="text-muted"
+                            >{{ similar.publish_date|date:"d/m/Y" }}</small
+                        >
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">
+                    Aucune actualité similaire trouvée.
+                </p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Catégories populaires -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-tags me-1"></i>Catégories Populaires</h5>
+            </div>
+            <div class="card-body">
+                {% for category in popular_categories %}
+                <a
+                    href="{% url 'web:home' %}?category={{ category.id }}"
+                    class="badge text-decoration-none me-1 mb-1"
+                    style="background-color: {{ category.color }};"
+                >
+                    {{ category.name }} ({{ category.news_count }})
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar me-1"></i>Statistiques</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="h4 text-primary">{{ total_news }}</div>
+                        <small class="text-muted">Total Actualités</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="h4 text-success">{{ recent_news }}</div>
+                        <small class="text-muted">Cette Semaine</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de partage -->
+{% if user.is_authenticated %}
+<div class="modal fade" id="shareModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Partager cette actualité</h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="shareUrl" class="form-label"
+                        >Lien de l'actualité</label
+                    >
+                    <div class="input-group">
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="shareUrl"
+                            value="{{ request.build_absolute_uri }}"
+                            readonly
+                        />
+                        <button
+                            class="btn btn-outline-secondary"
+                            type="button"
+                            onclick="copyToClipboard()"
+                        >
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a
+                        href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
+                        target="_blank"
+                        class="btn btn-primary"
+                    >
+                        <i class="fab fa-facebook me-1"></i>Partager sur
+                        Facebook
+                    </a>
+                    <a
+                        href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ news.title|urlencode }}"
+                        target="_blank"
+                        class="btn btn-info"
+                    >
+                        <i class="fab fa-twitter me-1"></i>Partager sur Twitter
+                    </a>
+                    <a
+                        href="https://wa.me/?text={{ news.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}"
+                        target="_blank"
+                        class="btn btn-success"
+                    >
+                        <i class="fab fa-whatsapp me-1"></i>Partager sur
+                        WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %} {% endblock %} {% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Like functionality
+        const likeBtn = document.querySelector(".like-btn")
+        if (likeBtn) {
+            likeBtn.addEventListener("click", function () {
+                const newsId = this.dataset.newsId
+                // Implementation for like functionality
+                console.log("Like clicked for news:", newsId)
+            })
+        }
+    })
+
+    function copyToClipboard() {
+        const shareUrl = document.getElementById("shareUrl")
+        shareUrl.select()
+        document.execCommand("copy")
+
+        // Show feedback
+        const btn = event.target.closest("button")
+        const originalHtml = btn.innerHTML
+        btn.innerHTML = '<i class="fas fa-check"></i>'
+        btn.classList.remove("btn-outline-secondary")
+        btn.classList.add("btn-success")
+
+        setTimeout(() => {
+            btn.innerHTML = originalHtml
+            btn.classList.remove("btn-success")
+            btn.classList.add("btn-outline-secondary")
+        }, 2000)
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Résumé quotidien - Actualités Étudiantes</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            .header {
+                background-color: #28a745;
+                color: white;
+                text-align: center;
+                padding: 20px;
+                border-radius: 8px 8px 0 0;
+            }
+            .content {
+                background-color: #f8f9fa;
+                padding: 30px;
+                border-radius: 0 0 8px 8px;
+            }
+            .news-item {
+                background-color: white;
+                padding: 20px;
+                margin-bottom: 20px;
+                border-radius: 8px;
+                border-left: 4px solid #007bff;
+            }
+            .news-title {
+                color: #007bff;
+                font-size: 18px;
+                margin-bottom: 10px;
+                text-decoration: none;
+            }
+            .news-title:hover {
+                text-decoration: underline;
+            }
+            .news-meta {
+                color: #6c757d;
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+            .category-badge {
+                display: inline-block;
+                padding: 3px 8px;
+                border-radius: 12px;
+                font-size: 11px;
+                color: white;
+                margin-right: 8px;
+            }
+            .importance-badge {
+                display: inline-block;
+                padding: 3px 8px;
+                border-radius: 12px;
+                font-size: 11px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+            .importance-urgent {
+                background-color: #dc3545;
+                color: white;
+            }
+            .importance-high {
+                background-color: #ffc107;
+                color: #212529;
+            }
+            .importance-medium {
+                background-color: #17a2b8;
+                color: white;
+            }
+            .importance-low {
+                background-color: #6c757d;
+                color: white;
+            }
+            .news-summary {
+                color: #555;
+                margin-top: 10px;
+            }
+            .stats {
+                background-color: white;
+                padding: 20px;
+                border-radius: 8px;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .button {
+                display: inline-block;
+                background-color: #28a745;
+                color: white;
+                text-decoration: none;
+                padding: 12px 25px;
+                border-radius: 5px;
+                font-weight: bold;
+                margin: 20px 0;
+            }
+            .footer {
+                text-align: center;
+                color: #6c757d;
+                font-size: 14px;
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 1px solid #dee2e6;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>📰 Résumé Quotidien</h1>
+            <p>Actualités Étudiantes Kinshasa</p>
+        </div>
+
+        <div class="content">
+            <p>Bonjour {{ user.get_full_name|default:user.username }},</p>
+
+            <div class="stats">
+                <h3>📊 Résumé d'hier</h3>
+                <p>
+                    <strong>{{ news_list|length }}</strong> nouvelle{{
+                    news_list|length|pluralize }} actualité{{
+                    news_list|length|pluralize }} publiée{{
+                    news_list|length|pluralize }}
+                </p>
+            </div>
+
+            {% if news_list %}
+            <h3>🔥 Les actualités d'hier</h3>
+
+            {% for news in news_list %}
+            <div class="news-item">
+                <div class="news-meta">
+                    <span
+                        class="category-badge"
+                        style="background-color: {{ news.category.color }};"
+                    >
+                        {{ news.category.name }}
+                    </span>
+                    <span
+                        class="importance-badge importance-{{ news.importance }}"
+                    >
+                        {{ news.get_importance_display }}
+                    </span>
+                    <span style="margin-left: 10px">
+                        📅 {{ news.publish_date|date:"H:i" }}
+                    </span>
+                </div>
+
+                <a href="{{ site_url }}/news/{{ news.id }}/" class="news-title">
+                    <h4>{{ news.title }}</h4>
+                </a>
+
+                <div class="news-summary">
+                    {{ news.content|truncatewords:25 }}
+                </div>
+
+                {% if news.target_universities %}
+                <div style="margin-top: 10px; font-size: 13px; color: #6c757d">
+                    🎓 {{ news.target_universities|join:", " }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div style="text-align: center">
+                <a href="{{ site_url }}/" class="button">
+                    Voir toutes les actualités
+                </a>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 40px">
+                <p>Aucune nouvelle actualité hier. Revenez demain !</p>
+                <a href="{{ site_url }}/" class="button"> Consulter le site </a>
+            </div>
+            {% endif %}
+
+            <div
+                style="
+                    background-color: white;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-top: 30px;
+                "
+            >
+                <h4>💡 Conseil du jour</h4>
+                <p>
+                    Restez connecté avec les dernières informations de votre
+                    université. N'hésitez pas à partager les actualités
+                    importantes avec vos camarades !
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>
+                <strong>Actualités Étudiantes Kinshasa</strong><br />
+                Votre source d'information universitaire quotidienne
+            </p>
+            <p>
+                <a href="{{ site_url }}/profile/" style="color: #28a745"
+                    >Gérer mes préférences</a
+                >
+                |
+                <a href="{{ site_url }}/unsubscribe/" style="color: #28a745"
+                    >Se désabonner</a
+                >
+            </p>
+            <p style="font-size: 12px; color: #888">
+                Vous recevez ce résumé quotidien car vous avez choisi la
+                fréquence "quotidien" dans vos préférences.
+            </p>
+        </div>
+    </body>
+</html>

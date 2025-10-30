@@ -1,0 +1,202 @@
+================================================================================
+COMPTES UTILISATEURS POUR TESTS
+================================================================================
+Système de gestion d'actualités - Projet N3 Fondation CCC
+Dernière mise à jour: 30 octobre 2025
+
+================================================================================
+ADMINISTRATEURS
+================================================================================
+
+1. Super Admin
+   Username: admin
+   Password: admin123
+   Email: admin@example.com
+   Rôle: Administrateur
+   Superuser: Oui
+   Note: Compte principal avec tous les droits
+
+================================================================================
+MODÉRATEURS
+================================================================================
+
+1. Modérateur 1
+   Username: moderateur1
+   Password: password123
+   Email: mod1@unikin.ac.cd
+   Nom: Jean Mukendi
+   Rôle: Modérateur
+   Université: UNIKIN
+   Programme: Administration
+
+2. Modérateur Test
+   Username: moderator
+   Password: moderator123
+   Email: moderator@example.com
+   Nom: Jean Moderateur
+   Rôle: Modérateur
+   Université: UNIKIN
+   Programme: Informatique
+
+3. Modérateur Test 2
+   Username: moderator_test
+   Password: test123
+   Email: moderator_test@test.com
+   Nom: Modérateur Test
+   Rôle: Modérateur
+
+================================================================================
+PUBLIANTS
+================================================================================
+
+1. Publiant 1
+   Username: publiant1
+   Password: password123
+   Email: pub1@upn.ac.cd
+   Nom: Marie Kabongo
+   Rôle: Publiant
+   Université: UPN
+   Programme: Relations Internationales
+
+2. Publiant Test
+   Username: publisher
+   Password: publisher123
+   Email: publisher@example.com
+   Nom: Marie Publiant
+   Rôle: Publiant
+   Université: UPN
+   Programme: Sciences
+
+3. Publiant Test 2
+   Username: publisher_test
+   Password: test123
+   Email: publisher_test@test.com
+   Nom: Publiant Test
+   Rôle: Publiant
+
+================================================================================
+ÉTUDIANTS
+================================================================================
+
+1. Étudiant 1
+   Username: etudiant1
+   Password: password123
+   Email: etud1@unikin.ac.cd
+   Nom: Pierre Tshisekedi
+   Rôle: Étudiant
+   Université: UNIKIN
+   Programme: Informatique
+
+2. Étudiant 2
+   Username: etudiant2
+   Password: password123
+   Email: etud2@upn.ac.cd
+   Nom: Grace Mbuyi
+   Rôle: Étudiant
+   Université: UPN
+   Programme: Économie
+
+3. Étudiant Test
+   Username: student_test
+   Password: test123
+   Email: student_test@test.com
+   Nom: Étudiant Test
+   Rôle: Étudiant
+
+================================================================================
+ENSEIGNANTS
+================================================================================
+
+1. Enseignant Test
+   Username: teacher_test
+   Password: test123
+   Email: teacher_test@test.com
+   Nom: Enseignant Test
+   Rôle: Enseignant
+
+================================================================================
+COMPTES DE TEST GÉNÉRIQUES
+================================================================================
+
+1. Test User
+   Username: testuser
+   Password: testuser123
+   Email: test@example.com
+   Nom: Test User
+   Rôle: Étudiant
+   Université: UNIKIN
+
+2. Demo
+   Username: demo
+   Password: demo123
+   Email: test@test.com
+   Rôle: Étudiant
+   Superuser: Oui
+
+3. Test
+   Username: test
+   Password: test123
+   Email: test@test.com
+   Nom: Test User
+   Rôle: Étudiant
+
+4. Test Mobile 3
+   Username: testmob3
+   Password: password123
+   Email: testmob3@ex.com
+   Nom: Test Mob3
+   Rôle: Étudiant
+
+5. Test User 888
+   Username: testuser888
+   Password: password123
+   Email: test888@test.com
+   Nom: Test User
+   Rôle: Étudiant
+
+================================================================================
+INSTRUCTIONS D'UTILISATION
+================================================================================
+
+1. CONNEXION WEB (React)
+   - URL: http://localhost:5173
+   - Utilisez username et password ci-dessus
+
+2. CONNEXION MOBILE (Flutter)
+   - Utilisez username et password ci-dessus
+   - Backend API: http://192.168.1.198:8000/api
+
+3. TESTER LES PERMISSIONS
+   - Admin: Peut tout faire (créer, modifier, supprimer, modérer)
+   - Modérateur: Peut modérer les actualités (approuver/rejeter)
+   - Publiant: Peut créer des actualités qui sont publiées directement
+   - Étudiant: Peut créer des actualités qui nécessitent modération
+   - Enseignant: Peut créer des actualités qui sont publiées directement
+
+4. CRÉER UN NOUVEAU COMPTE
+   - Web: Aller sur /register
+   - Mobile: Bouton "S'inscrire" sur l'écran de connexion
+   - Remplir tous les champs obligatoires
+
+================================================================================
+NOTES IMPORTANTES
+================================================================================
+
+- Tous les comptes avec "password123" utilisent le même mot de passe
+- Les comptes avec "test123" sont pour tests rapides
+- Les superusers (admin, demo) ont accès au panel d'administration Django
+- Pour réinitialiser un mot de passe, utilisez le script backend/list_users.py
+
+================================================================================
+ACCÈS API DIRECTE
+================================================================================
+
+Login:
+POST http://127.0.0.1:8000/api/auth/login/
+Body: {"username": "admin", "password": "admin123"}
+Response: {"token": "...", "user": {...}}
+
+Utiliser le token:
+Authorization: Token <votre_token>
+
+================================================================================

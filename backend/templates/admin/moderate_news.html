@@ -1,0 +1,346 @@
+{% extends 'base.html' %} {% block title %}Modération - {{ news.title }}{%
+endblock %} {% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4>
+                    <i class="fas fa-gavel me-2"></i>Modération de l'actualité
+                </h4>
+            </div>
+            <div class="card-body">
+                <!-- Informations sur l'actualité -->
+                <div class="bg-light p-3 rounded mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Auteur:</strong> {{
+                            news.author.get_full_name|default:news.author.username
+                            }}<br />
+                            <strong>Créé le:</strong> {{
+                            news.created_at|date:"d/m/Y à H:i" }}<br />
+                            <strong>Statut:</strong>
+                            {% if news.status == 'pending' %}
+                            <span class="badge bg-warning">En attente</span>
+                            {% elif news.status == 'published' %}
+                            <span class="badge bg-success">Publié</span>
+                            {% elif news.status == 'rejected' %}
+                            <span class="badge bg-danger">Rejeté</span>
+                            {% else %}
+                            <span class="badge bg-secondary"
+                                >{{ news.status }}</span
+                            >
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Catégorie:</strong>
+                            <span
+                                class="badge"
+                                style="background-color: {{ news.category.color }};"
+                            >
+                                {{ news.category.name }} </span
+                            ><br />
+                            <strong>Importance:</strong>
+                            {% if news.importance == 'urgent' %}
+                            <span class="badge bg-danger">URGENT</span>
+                            {% elif news.importance == 'high' %}
+                            <span class="badge bg-warning text-dark"
+                                >ÉLEVÉE</span
+                            >
+                            {% elif news.importance == 'medium' %}
+                            <span class="badge bg-info">MOYENNE</span>
+                            {% else %}
+                            <span class="badge bg-secondary">FAIBLE</span>
+                            {% endif %}<br />
+                            {% if news.target_universities %}
+                            <strong>Universités:</strong> {{
+                            news.target_universities|join:", " }} {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contenu actuel -->
+                <div class="mb-4">
+                    <h5>Contenu actuel</h5>
+                    <div class="border p-3 rounded">
+                        <h6>{{ news.title }}</h6>
+                        {% if news.image %}
+                        <img
+                            src="{{ news.image.url }}"
+                            class="img-thumbnail mb-2"
+                            style="max-width: 200px"
+                            alt="Image"
+                        />
+                        {% endif %}
+                        <p>{{ news.content|linebreaks }}</p>
+                    </div>
+                </div>
+
+                <!-- Formulaire de modération -->
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Action à effectuer</label>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="action"
+                                        value="approve"
+                                        id="approve"
+                                    />
+                                    <label
+                                        class="form-check-label text-success"
+                                        for="approve"
+                                    >
+                                        <i class="fas fa-check me-1"></i
+                                        >Approuver
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="action"
+                                        value="reject"
+                                        id="reject"
+                                    />
+                                    <label
+                                        class="form-check-label text-danger"
+                                        for="reject"
+                                    >
+                                        <i class="fas fa-times me-1"></i>Rejeter
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="action"
+                                        value="edit"
+                                        id="edit"
+                                    />
+                                    <label
+                                        class="form-check-label text-warning"
+                                        for="edit"
+                                    >
+                                        <i class="fas fa-edit me-1"></i>Modifier
+                                        et approuver
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        {% if form.action.errors %}
+                        <div class="text-danger small">
+                            {{ form.action.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label
+                            for="{{ form.reason.id_for_label }}"
+                            class="form-label"
+                        >
+                            Commentaire/Raison
+                            <span
+                                class="text-danger"
+                                id="reason-required"
+                                style="display: none"
+                                >*</span
+                            >
+                        </label>
+                        {{ form.reason }} {% if form.reason.errors %}
+                        <div class="text-danger small">
+                            {{ form.reason.errors.0 }}
+                        </div>
+                        {% endif %}
+                        <div class="form-text">
+                            Obligatoire pour rejet, optionnel pour approbation
+                            et modification.
+                        </div>
+                    </div>
+
+                    <!-- Champs de modification (masqués par défaut) -->
+                    <div id="edit-fields" style="display: none">
+                        <hr />
+                        <h5>Modification du contenu</h5>
+
+                        <div class="mb-3">
+                            <label
+                                for="{{ form.title.id_for_label }}"
+                                class="form-label"
+                                >Titre modifié</label
+                            >
+                            {{ form.title }} {% if form.title.errors %}
+                            <div class="text-danger small">
+                                {{ form.title.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label
+                                for="{{ form.content.id_for_label }}"
+                                class="form-label"
+                                >Contenu modifié</label
+                            >
+                            {{ form.content }} {% if form.content.errors %}
+                            <div class="text-danger small">
+                                {{ form.content.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between">
+                        <a
+                            href="{% url 'web:admin_dashboard' %}"
+                            class="btn btn-outline-secondary"
+                        >
+                            <i class="fas fa-arrow-left me-1"></i>Retour
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Valider la décision
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historique de modération -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>
+                    <i class="fas fa-history me-1"></i>Historique de modération
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if moderation_history %} {% for log in moderation_history %}
+                <div class="border-bottom pb-2 mb-2">
+                    <div
+                        class="d-flex justify-content-between align-items-start"
+                    >
+                        <div>
+                            <strong>{{ log.get_action_display }}</strong><br />
+                            <small class="text-muted">
+                                Par {{
+                                log.moderator.get_full_name|default:log.moderator.username
+                                }}<br />
+                                {{ log.timestamp|date:"d/m/Y à H:i" }}
+                            </small>
+                        </div>
+                        <span
+                            class="badge {% if log.action == 'approved' %}bg-success {% elif log.action == 'rejected' %}bg-danger {% elif log.action == 'edited' %}bg-warning {% else %}bg-secondary{% endif %}"
+                        >
+                            {{ log.get_action_display }}
+                        </span>
+                    </div>
+                    {% if log.reason %}
+                    <p class="small mt-2 mb-0"><em>"{{ log.reason }}"</em></p>
+                    {% endif %} {% if log.previous_content and log.new_content
+                    %}
+                    <button
+                        class="btn btn-sm btn-outline-info mt-1"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#diff-{{ log.id }}"
+                    >
+                        <i class="fas fa-eye me-1"></i>Voir les modifications
+                    </button>
+                    <div class="collapse mt-2" id="diff-{{ log.id }}">
+                        <div class="card card-body small">
+                            <strong>Avant:</strong>
+                            <pre class="small">
+{{ log.previous_content|truncatewords:30 }}</pre
+                            >
+                            <strong>Après:</strong>
+                            <pre class="small">
+{{ log.new_content|truncatewords:30 }}</pre
+                            >
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %} {% else %}
+                <p class="text-muted">Aucun historique de modération.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Informations supplémentaires -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6>
+                    <i class="fas fa-info-circle me-1"></i>Guide de modération
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="small mb-0">
+                    <li>
+                        <strong>Approuver:</strong> L'actualité sera publiée
+                        immédiatement et les notifications envoyées.
+                    </li>
+                    <li>
+                        <strong>Rejeter:</strong> L'actualité sera marquée comme
+                        rejetée. Un commentaire est obligatoire.
+                    </li>
+                    <li>
+                        <strong>Modifier:</strong> Vous pouvez corriger le titre
+                        et/ou le contenu avant publication.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const actionRadios = document.querySelectorAll('input[name="action"]')
+        const editFields = document.getElementById("edit-fields")
+        const reasonRequired = document.getElementById("reason-required")
+        const reasonField = document.getElementById("id_reason")
+        const titleField = document.getElementById("id_title")
+        const contentField = document.getElementById("id_content")
+
+        // Pré-remplir les champs de modification avec les valeurs actuelles
+        titleField.value = "{{ news.title|escapejs }}"
+        contentField.value = `{{ news.content|escapejs }}`
+
+        actionRadios.forEach((radio) => {
+            radio.addEventListener("change", function () {
+                if (this.value === "edit") {
+                    editFields.style.display = "block"
+                    reasonRequired.style.display = "none"
+                    reasonField.required = false
+                } else if (this.value === "reject") {
+                    editFields.style.display = "none"
+                    reasonRequired.style.display = "inline"
+                    reasonField.required = true
+                } else {
+                    editFields.style.display = "none"
+                    reasonRequired.style.display = "none"
+                    reasonField.required = false
+                }
+            })
+        })
+    })
+</script>
+{% endblock %}

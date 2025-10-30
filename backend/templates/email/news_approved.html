@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Article Approuvé</title>
+        <style>
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 20px;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: white;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+            }
+            .header {
+                background: linear-gradient(135deg, #4caf50, #45a049);
+                color: white;
+                padding: 30px;
+                text-align: center;
+            }
+            .header h1 {
+                margin: 0;
+                font-size: 24px;
+            }
+            .checkmark {
+                font-size: 48px;
+                color: white;
+                margin-bottom: 15px;
+            }
+            .content {
+                padding: 30px;
+            }
+            .article-info {
+                background-color: #f8f9fa;
+                border-left: 4px solid #4caf50;
+                padding: 20px;
+                margin: 20px 0;
+                border-radius: 4px;
+            }
+            .article-info h3 {
+                margin-top: 0;
+                color: #2c3e50;
+            }
+            .info-item {
+                margin: 10px 0;
+                padding: 5px 0;
+            }
+            .info-label {
+                font-weight: bold;
+                color: #555;
+            }
+            .success-message {
+                background-color: #d4edda;
+                border: 1px solid #c3e6cb;
+                color: #155724;
+                padding: 15px;
+                border-radius: 5px;
+                margin: 20px 0;
+            }
+            .cta-button {
+                display: inline-block;
+                background-color: #4caf50;
+                color: white;
+                padding: 12px 30px;
+                text-decoration: none;
+                border-radius: 5px;
+                margin: 20px 0;
+                font-weight: bold;
+            }
+            .cta-button:hover {
+                background-color: #45a049;
+            }
+            .footer {
+                background-color: #2c3e50;
+                color: white;
+                padding: 20px;
+                text-align: center;
+                font-size: 14px;
+            }
+            .footer a {
+                color: #ecf0f1;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="checkmark">✓</div>
+                <h1>Article Approuvé !</h1>
+                <p>Félicitations ! Votre article a été publié</p>
+            </div>
+
+            <div class="content">
+                <p>
+                    Bonjour {{ author.get_full_name|default:author.username }},
+                </p>
+
+                <div class="success-message">
+                    <strong>Excellente nouvelle !</strong> Votre article a été
+                    approuvé par notre équipe de modération et est maintenant
+                    publié sur notre plateforme.
+                </div>
+
+                <div class="article-info">
+                    <h3>{{ news.title }}</h3>
+                    <div class="info-item">
+                        <span class="info-label">Catégorie:</span> {{
+                        news.category.name }}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Importance:</span> {{
+                        news.get_importance_display }}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Date de publication:</span> {{
+                        news.publish_date|date:"d/m/Y à H:i" }}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Approuvé par:</span> {{
+                        moderator.get_full_name|default:moderator.username }}
+                    </div>
+                    {% if reason %}
+                    <div class="info-item">
+                        <span class="info-label"
+                            >Commentaire du modérateur:</span
+                        >
+                        {{ reason }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <p>
+                    Votre article est maintenant visible par tous les
+                    utilisateurs de la plateforme. Ils peuvent le lire, le
+                    commenter et le partager.
+                </p>
+
+                <p>
+                    Merci pour votre contribution précieuse à notre communauté
+                    étudiante !
+                </p>
+
+                <a href="{{ site_url }}/news/{{ news.pk }}/" class="cta-button"
+                    >Voir mon article publié</a
+                >
+
+                <hr
+                    style="
+                        margin: 30px 0;
+                        border: none;
+                        border-top: 1px solid #eee;
+                    "
+                />
+
+                <p style="font-size: 14px; color: #666">
+                    Vous pouvez désormais:
+                    <br />• Partager votre article avec vos amis <br />•
+                    Répondre aux commentaires des lecteurs <br />• Consulter les
+                    statistiques de lecture <br />• Soumettre de nouveaux
+                    articles
+                </p>
+            </div>
+
+            <div class="footer">
+                <p><strong>Actualités Étudiantes Kinshasa</strong></p>
+                <p>Votre plateforme d'information étudiante</p>
+                <p><a href="{{ site_url }}">Visitez notre site web</a></p>
+            </div>
+        </div>
+    </body>
+</html>

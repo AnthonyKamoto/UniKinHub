@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Confirmation de Soumission</title>
+        <style>
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 20px;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: white;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+            }
+            .header {
+                background: linear-gradient(135deg, #2196f3, #1976d2);
+                color: white;
+                padding: 30px;
+                text-align: center;
+            }
+            .header h1 {
+                margin: 0;
+                font-size: 24px;
+            }
+            .icon {
+                font-size: 48px;
+                color: white;
+                margin-bottom: 15px;
+            }
+            .content {
+                padding: 30px;
+            }
+            .article-info {
+                background-color: #f8f9fa;
+                border-left: 4px solid #2196f3;
+                padding: 20px;
+                margin: 20px 0;
+                border-radius: 4px;
+            }
+            .article-info h3 {
+                margin-top: 0;
+                color: #2c3e50;
+            }
+            .info-item {
+                margin: 10px 0;
+                padding: 5px 0;
+            }
+            .info-label {
+                font-weight: bold;
+                color: #555;
+            }
+            .confirmation-message {
+                background-color: #d4edda;
+                border: 1px solid #c3e6cb;
+                color: #155724;
+                padding: 15px;
+                border-radius: 5px;
+                margin: 20px 0;
+            }
+            .timeline {
+                background-color: #fff3cd;
+                border: 1px solid #ffeaa7;
+                color: #856404;
+                padding: 15px;
+                border-radius: 5px;
+                margin: 20px 0;
+            }
+            .next-steps {
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                padding: 20px;
+                border-radius: 5px;
+                margin: 20px 0;
+            }
+            .next-steps ul {
+                margin: 10px 0 0 20px;
+                padding: 0;
+            }
+            .next-steps li {
+                margin: 8px 0;
+            }
+            .cta-button {
+                display: inline-block;
+                background-color: #2196f3;
+                color: white;
+                padding: 12px 30px;
+                text-decoration: none;
+                border-radius: 5px;
+                margin: 20px 0;
+                font-weight: bold;
+            }
+            .cta-button:hover {
+                background-color: #1976d2;
+            }
+            .footer {
+                background-color: #2c3e50;
+                color: white;
+                padding: 20px;
+                text-align: center;
+                font-size: 14px;
+            }
+            .footer a {
+                color: #ecf0f1;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="icon">📝</div>
+                <h1>Soumission Reçue !</h1>
+                <p>Votre article est en attente de modération</p>
+            </div>
+
+            <div class="content">
+                <p>
+                    Bonjour {{ author.get_full_name|default:author.username }},
+                </p>
+
+                <div class="confirmation-message">
+                    <strong>Merci pour votre soumission !</strong> Nous avons
+                    bien reçu votre article et il est maintenant en file
+                    d'attente pour révision.
+                </div>
+
+                <div class="article-info">
+                    <h3>{{ news.title }}</h3>
+                    <div class="info-item">
+                        <span class="info-label">Catégorie:</span> {{
+                        news.category.name }}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Niveau d'importance:</span> {{
+                        news.get_importance_display }}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Date de soumission:</span> {{
+                        news.created_at|date:"d/m/Y à H:i" }}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Statut:</span> En attente de
+                        modération
+                    </div>
+                </div>
+
+                <div class="timeline">
+                    <h4 style="margin-top: 0">Temps de traitement estimé:</h4>
+                    <p style="margin-bottom: 0">
+                        Notre équipe de modération examine généralement les
+                        articles dans les <strong>24 à 72 heures</strong>. Les
+                        articles d'importance élevée ou urgente sont traités en
+                        priorité.
+                    </p>
+                </div>
+
+                <div class="next-steps">
+                    <h4>Prochaines étapes:</h4>
+                    <ul>
+                        <li>
+                            <strong>Révision par notre équipe</strong> -
+                            Vérification du contenu, de la pertinence et de la
+                            qualité
+                        </li>
+                        <li>
+                            <strong>Notification par email</strong> - Vous
+                            recevrez un email avec la décision (approbation ou
+                            demande de modification)
+                        </li>
+                        <li>
+                            <strong>Publication</strong> - Si approuvé, votre
+                            article sera publié et visible par tous
+                        </li>
+                        <li>
+                            <strong>Révision si nécessaire</strong> - Si des
+                            modifications sont demandées, vous pourrez modifier
+                            et resoumette
+                        </li>
+                    </ul>
+                </div>
+
+                <p>
+                    Pendant l'attente, vous pouvez continuer à utiliser la
+                    plateforme normalement. Vous recevrez automatiquement une
+                    notification dès que votre article aura été examiné.
+                </p>
+
+                <a href="{{ site_url }}/profile" class="cta-button"
+                    >Consulter mes articles</a
+                >
+
+                <hr
+                    style="
+                        margin: 30px 0;
+                        border: none;
+                        border-top: 1px solid #eee;
+                    "
+                />
+
+                <p style="font-size: 14px; color: #666">
+                    <strong>Rappel de nos critères de publication:</strong
+                    ><br />
+                    • Contenu pertinent pour la communauté étudiante<br />
+                    • Respect de la charte éditoriale<br />
+                    • Information vérifiée et sources fiables<br />
+                    • Langue française correcte<br />
+                    • Respect des autres utilisateurs
+                </p>
+
+                <p style="font-size: 14px; color: #666; margin-top: 20px">
+                    <strong>Questions ?</strong> Si vous avez des interrogations
+                    sur le processus de modération, n'hésitez pas à nous
+                    contacter.
+                </p>
+            </div>
+
+            <div class="footer">
+                <p><strong>Actualités Étudiantes Kinshasa</strong></p>
+                <p>Votre plateforme d'information étudiante</p>
+                <p><a href="{{ site_url }}">Visitez notre site web</a></p>
+            </div>
+        </div>
+    </body>
+</html>

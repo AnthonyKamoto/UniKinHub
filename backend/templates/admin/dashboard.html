@@ -1,0 +1,230 @@
+{% extends 'base.html' %} {% block title %}Tableau de bord Administration -
+Actualités Étudiantes{% endblock %} {% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-tachometer-alt me-2"></i>Tableau de Bord
+                Administration
+            </h2>
+            <div>
+                <span class="badge bg-primary"
+                    >{{ user.get_role_display }}</span
+                >
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistiques -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ stats.total_users }}</h4>
+                        <p class="mb-0">Utilisateurs</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ stats.published_news }}</h4>
+                        <p class="mb-0">Publiées</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-newspaper fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ stats.pending_news }}</h4>
+                        <p class="mb-0">En attente</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card bg-secondary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ stats.draft_news }}</h4>
+                        <p class="mb-0">Brouillons</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-edit fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Actualités en attente de modération -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>
+                    <i class="fas fa-exclamation-triangle me-1"></i>Actualités
+                    en attente de modération ({{ pending_news|length }})
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if pending_news %} {% for news in pending_news %}
+                <div class="border-bottom pb-3 mb-3">
+                    <div
+                        class="d-flex justify-content-between align-items-start"
+                    >
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">{{ news.title }}</h6>
+                            <p class="text-muted small mb-2">
+                                <i class="fas fa-user me-1"></i>{{
+                                news.author.get_full_name|default:news.author.username
+                                }} <i class="fas fa-calendar ms-2 me-1"></i>{{
+                                news.created_at|date:"d/m/Y à H:i" }}
+                                <span
+                                    class="badge ms-2"
+                                    style="background-color: {{ news.category.color }};"
+                                >
+                                    {{ news.category.name }}
+                                </span>
+                                {% if news.importance == 'urgent' %}
+                                <span class="badge bg-danger ms-1">URGENT</span>
+                                {% elif news.importance == 'high' %}
+                                <span class="badge bg-warning text-dark ms-1"
+                                    >ÉLEVÉE</span
+                                >
+                                {% endif %}
+                            </p>
+                            <p class="mb-2">
+                                {{ news.content|truncatewords:20 }}
+                            </p>
+                            {% if news.target_universities %}
+                            <p class="small text-muted mb-0">
+                                <i class="fas fa-university me-1"></i>{{
+                                news.target_universities|join:", " }}
+                            </p>
+                            {% endif %}
+                        </div>
+                        <div class="ms-3">
+                            <a
+                                href="{% url 'web:moderate_news' news.pk %}"
+                                class="btn btn-primary btn-sm"
+                            >
+                                <i class="fas fa-gavel me-1"></i>Modérer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %} {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <h5>Aucune actualité en attente</h5>
+                    <p class="text-muted">
+                        Toutes les actualités ont été traitées.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt me-1"></i>Actions Rapides</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a
+                        href="{% url 'web:create_news' %}"
+                        class="btn btn-success"
+                    >
+                        <i class="fas fa-plus me-1"></i>Créer une actualité
+                    </a>
+                    <a href="{% url 'admin:index' %}" class="btn btn-primary">
+                        <i class="fas fa-cog me-1"></i>Administration Django
+                    </a>
+                    <button
+                        class="btn btn-info"
+                        onclick="sendTestNotification()"
+                    >
+                        <i class="fas fa-paper-plane me-1"></i>Test
+                        notifications
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actualités récentes -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5>
+                    <i class="fas fa-newspaper me-1"></i>Actualités Récentes
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for news in recent_news %}
+                <div class="d-flex align-items-center mb-2">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">
+                            <a
+                                href="{% url 'web:news_detail' news.pk %}"
+                                class="text-decoration-none"
+                            >
+                                {{ news.title|truncatechars:40 }}
+                            </a>
+                        </h6>
+                        <small class="text-muted"
+                            >{{ news.publish_date|date:"d/m à H:i" }}</small
+                        >
+                    </div>
+                    <span class="badge bg-success">{{ news.status }}</span>
+                </div>
+                {% empty %}
+                <p class="text-muted">Aucune actualité récente.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+    function sendTestNotification() {
+        if (confirm("Envoyer une notification de test ?")) {
+            // Ici on pourrait faire un appel AJAX pour tester les notifications
+            alert("Fonctionnalité de test à implémenter")
+        }
+    }
+
+    // Auto-refresh toutes les 5 minutes
+    setTimeout(function () {
+        location.reload()
+    }, 5 * 60 * 1000)
+</script>
+{% endblock %}

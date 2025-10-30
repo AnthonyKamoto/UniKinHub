@@ -1,0 +1,27 @@
+# Requirements minimaux pour le développement local avec SQLite
+# Actualités Étudiantes Kinshasa
+
+# Django et extensions
+Django==5.2.7
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+
+# Sécurité et authentification
+django-allauth==0.57.0
+djangorestframework-simplejwt==5.3.0
+cryptography==41.0.7
+
+# Gestion des fichiers et médias
+Pillow==10.0.1
+
+# API et filtres
+django-filter==23.3
+
+# Production (fichiers statiques)
+whitenoise==6.6.0
+
+# Utilitaires
+python-decouple==3.8
+python-dotenv==1.0.0
+requests==2.31.0
+dateutils==0.6.12

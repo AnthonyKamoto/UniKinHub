@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accueil - Actualités Étudiantes Kinshasa{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar avec filtres -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-filter me-1"></i>Filtres</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" id="filterForm">
+                    <!-- Recherche -->
+                    <div class="mb-3">
+                        <label for="search" class="form-label">Recherche</label>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               value="{{ request.GET.search }}" placeholder="Rechercher...">
+                    </div>
+                    
+                    <!-- Catégorie -->
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Catégorie</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="">Toutes les catégories</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat.id }}" 
+                                        {% if request.GET.category == cat.id|stringformat:'s' %}selected{% endif %}>
+                                    {{ cat.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Importance -->
+                    <div class="mb-3">
+                        <label for="importance" class="form-label">Importance</label>
+                        <select class="form-select" id="importance" name="importance">
+                            <option value="">Toutes</option>
+                            <option value="urgent" {% if request.GET.importance == 'urgent' %}selected{% endif %}>Urgent</option>
+                            <option value="high" {% if request.GET.importance == 'high' %}selected{% endif %}>Élevée</option>
+                            <option value="medium" {% if request.GET.importance == 'medium' %}selected{% endif %}>Moyenne</option>
+                            <option value="low" {% if request.GET.importance == 'low' %}selected{% endif %}>Faible</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Université -->
+                    <div class="mb-3">
+                        <label for="university" class="form-label">Université</label>
+                        <select class="form-select" id="university" name="university">
+                            <option value="">Toutes</option>
+                            <option value="UNIKIN" {% if request.GET.university == 'UNIKIN' %}selected{% endif %}>UNIKIN</option>
+                            <option value="UPN" {% if request.GET.university == 'UPN' %}selected{% endif %}>UPN</option>
+                            <option value="UNIKAT" {% if request.GET.university == 'UNIKAT' %}selected{% endif %}>UNIKAT</option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>Filtrer
+                        </button>
+                        <a href="{% url 'web:home' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Effacer
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Statistiques -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar me-1"></i>Statistiques</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-12 mb-2">
+                        <div class="h4 text-primary">{{ stats.total_news }}</div>
+                        <small class="text-muted">Actualités</small>
+                    </div>
+                    <div class="col-12">
+                        <div class="h4 text-success">{{ stats.recent_news }}</div>
+                        <small class="text-muted">Cette semaine</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contenu principal -->
+    <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-newspaper me-2"></i>
+                Actualités Récentes
+                {% if request.GET.search %}
+                    <small class="text-muted">- Recherche : "{{ request.GET.search }}"</small>
+                {% endif %}
+            </h2>
+            
+            {% if user.is_authenticated and user.role in 'publisher,admin' %}
+                <a href="{% url 'web:create_news' %}" class="btn btn-success">
+                    <i class="fas fa-plus me-1"></i>Nouvelle Actualité
+                </a>
+            {% endif %}
+        </div>
+        
+        {% if news_list %}
+            <div class="row">
+                {% for news in news_list %}
+                    <div class="col-12 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            {% if news.image %}
+                                <img src="{{ news.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ news.title }}">
+                            {% endif %}
+                            
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge" style="background-color: {{ news.category.color }};">
+                                        {{ news.category.name }}
+                                    </span>
+                                    
+                                    {% if news.importance == 'urgent' %}
+                                        <span class="badge bg-danger">URGENT</span>
+                                    {% elif news.importance == 'high' %}
+                                        <span class="badge bg-warning">ÉLEVÉE</span>
+                                    {% elif news.importance == 'medium' %}
+                                        <span class="badge bg-info">MOYENNE</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">FAIBLE</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <h5 class="card-title">
+                                    <a href="{% url 'web:news_detail' news.id %}" class="text-decoration-none">
+                                        {{ news.title }}
+                                    </a>
+                                </h5>
+                                
+                                <p class="card-text">
+                                    {{ news.content|truncatewords:30 }}
+                                </p>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>{{ news.author.get_full_name|default:news.author.username }}
+                                        <i class="fas fa-calendar ms-2 me-1"></i>{{ news.publish_date|date:"d/m/Y à H:i" }}
+                                    </small>
+                                    
+                                    <div>
+                                        <small class="text-muted me-2">
+                                            <i class="fas fa-eye me-1"></i>{{ news.views_count }}
+                                        </small>
+                                        <small class="text-muted">
+                                            <i class="fas fa-heart me-1"></i>{{ news.likes_count }}
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                {% if news.target_universities %}
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-university me-1"></i>
+                                            Ciblé : {{ news.target_universities|join:", " }}
+                                        </small>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="card-footer bg-transparent">
+                                <a href="{% url 'web:news_detail' news.id %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-read me-1"></i>Lire la suite
+                                </a>
+                                
+                                {% if user.is_authenticated %}
+                                    <button class="btn btn-outline-danger btn-sm ms-1 like-btn" 
+                                            data-news-id="{{ news.id }}"
+                                            data-liked="false">
+                                        <i class="fas fa-heart me-1"></i>J'aime
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Aucune actualité trouvée</h4>
+                            <p class="text-muted">Essayez de modifier vos critères de recherche.</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <nav aria-label="Navigation pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page=1">Premier</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">Précédent</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Suivant</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Dernier</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">Aucune actualité disponible</h4>
+                <p class="text-muted">Revenez plus tard pour découvrir les dernières informations.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-submit form on filter change
+    const filterForm = document.getElementById('filterForm');
+    const selects = filterForm.querySelectorAll('select');
+    
+    selects.forEach(select => {
+        select.addEventListener('change', function() {
+            filterForm.submit();
+        });
+    });
+    
+    // Like functionality
+    const likeButtons = document.querySelectorAll('.like-btn');
+    likeButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const newsId = this.dataset.newsId;
+            // Implementation for like functionality would go here
+            console.log('Like clicked for news:', newsId);
+        });
+    });
+});
+</script>
+{% endblock %}

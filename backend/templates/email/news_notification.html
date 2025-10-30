@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Nouvelle actualité - {{ news.title }}</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            .header {
+                background-color: #007bff;
+                color: white;
+                text-align: center;
+                padding: 20px;
+                border-radius: 8px 8px 0 0;
+            }
+            .content {
+                background-color: #f8f9fa;
+                padding: 30px;
+                border-radius: 0 0 8px 8px;
+            }
+            .news-title {
+                color: #007bff;
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+            .news-meta {
+                background-color: white;
+                padding: 15px;
+                border-radius: 5px;
+                margin: 20px 0;
+            }
+            .news-content {
+                background-color: white;
+                padding: 20px;
+                border-radius: 5px;
+                margin: 20px 0;
+            }
+            .importance-badge {
+                display: inline-block;
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 12px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+            .importance-urgent {
+                background-color: #dc3545;
+                color: white;
+            }
+            .importance-high {
+                background-color: #ffc107;
+                color: #212529;
+            }
+            .importance-medium {
+                background-color: #17a2b8;
+                color: white;
+            }
+            .importance-low {
+                background-color: #6c757d;
+                color: white;
+            }
+            .category-badge {
+                display: inline-block;
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 12px;
+                color: white;
+                margin-right: 10px;
+            }
+            .button {
+                display: inline-block;
+                background-color: #007bff;
+                color: white;
+                text-decoration: none;
+                padding: 12px 25px;
+                border-radius: 5px;
+                font-weight: bold;
+                margin: 20px 0;
+            }
+            .footer {
+                text-align: center;
+                color: #6c757d;
+                font-size: 14px;
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 1px solid #dee2e6;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>Actualités Étudiantes Kinshasa</h1>
+            <p>Nouvelle actualité publiée</p>
+        </div>
+
+        <div class="content">
+            <p>Bonjour {{ user.get_full_name|default:user.username }},</p>
+
+            <p>
+                Une nouvelle actualité qui pourrait vous intéresser vient d'être
+                publiée :
+            </p>
+
+            <div class="news-meta">
+                <span
+                    class="category-badge"
+                    style="background-color: {{ news.category.color }};"
+                >
+                    {{ news.category.name }}
+                </span>
+                <span class="importance-badge importance-{{ news.importance }}">
+                    {{ news.get_importance_display }}
+                </span>
+            </div>
+
+            <h2 class="news-title">{{ news.title }}</h2>
+
+            <div class="news-content">
+                <p><strong>Résumé :</strong></p>
+                <p>{{ news.content|truncatewords:50 }}</p>
+
+                {% if news.target_universities %}
+                <p>
+                    <strong>Universités concernées :</strong> {{
+                    news.target_universities|join:", " }}
+                </p>
+                {% endif %}
+
+                <p>
+                    <strong>Publié par :</strong> {{
+                    news.author.get_full_name|default:news.author.username }}
+                </p>
+                <p>
+                    <strong>Date de publication :</strong> {{
+                    news.publish_date|date:"d/m/Y à H:i" }}
+                </p>
+            </div>
+
+            <div style="text-align: center">
+                <a href="{{ site_url }}/news/{{ news.id }}/" class="button">
+                    Lire l'article complet
+                </a>
+            </div>
+
+            <p>
+                Vous recevez cet email car vous êtes abonné aux notifications
+                d'actualités avec la fréquence "{{ user.notification_frequency
+                }}".
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>
+                <strong>Actualités Étudiantes Kinshasa</strong><br />
+                Système de diffusion d'informations pour les universités de
+                Kinshasa
+            </p>
+            <p>
+                <a href="{{ site_url }}/profile/" style="color: #007bff"
+                    >Gérer mes préférences</a
+                >
+                |
+                <a href="{{ site_url }}/unsubscribe/" style="color: #007bff"
+                    >Se désabonner</a
+                >
+            </p>
+        </div>
+    </body>
+</html>

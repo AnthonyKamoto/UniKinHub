@@ -1,0 +1,70 @@
+# Environnements virtuels Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Variables d'environnement et configuration sensible
+.env
+.env.local
+.env.production
+email_config.py
+
+# Base de données
+*.sqlite3
+db.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Media files (uploads)
+media/
+
+# Static files collectés
+staticfiles/
+static_collected/
+
+# IDE et éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Système d'exploitation
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node.js (pour le frontend React)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# Build frontend
+/frontend-react/dist/
+/frontend-react/build/
+
+# Fichiers temporaires
+*.tmp
+*.temp
+.cache/
+
+# Configuration locale
+local_settings.py
+settings_local.py
+
+# Sauvegarde de base de données
+*.backup
+*.dump
+
+# Certificats et clés
+*.key
+*.pem
+*.crt
