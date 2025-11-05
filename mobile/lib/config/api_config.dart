@@ -35,7 +35,7 @@ class ApiConfig {
     // Ajouter le token si disponible
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('access_token');
+      final token = prefs.getString('auth_token');
       if (token != null && token.isNotEmpty) {
         headers['Authorization'] = 'Bearer $token';
       }
@@ -57,6 +57,17 @@ class ApiConfig {
     } catch (e) {
       print('❌ Impossible de se connecter au serveur: $e');
       return false;
+    }
+  }
+
+  // Obtenir le token d'authentification
+  static Future<String?> getAuthToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString('auth_token');
+    } catch (e) {
+      print('❌ Erreur lors de la récupération du token: $e');
+      return null;
     }
   }
 

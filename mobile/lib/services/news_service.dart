@@ -9,7 +9,7 @@ class NewsService {
 
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('access_token');
+    return prefs.getString('auth_token');
   }
 
   Future<Map<String, dynamic>> getNews({
@@ -76,8 +76,34 @@ class NewsService {
   }
 
   Future<Map<String, dynamic>> getNewsById(int id) async {
-    print("NewsService: Mock getNewsById $id");
-    return {'success': true, 'news': null};
+    try {
+      final token = await _getToken();
+      if (token == null) {
+        return {'success': false, 'error': 'Non connecté'};
+      }
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/news-api/$id/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final news = News.fromJson(data);
+        return {'success': true, 'news': news};
+      } else {
+        return {
+          'success': false,
+          'error': 'Erreur de chargement de l\'actualité',
+        };
+      }
+    } catch (e) {
+      print("NewsService: Error getNewsById - $e");
+      return {'success': false, 'error': 'Erreur de réseau: $e'};
+    }
   }
 
   Future<Map<String, dynamic>> createNews({
@@ -94,8 +120,8 @@ class NewsService {
       }
 
       final body = {
-        'title': title,
-        'content': content,
+        'draft_title': title,
+        'draft_content': content,
         'category': categoryId,
         'importance': importance ?? 'medium',
         'target_universities': <String>[],
@@ -103,7 +129,7 @@ class NewsService {
       };
 
       final response = await http.post(
-        Uri.parse('$baseUrl/news/create/'),
+        Uri.parse('$baseUrl/api/news-api/'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Token $token',
@@ -114,7 +140,7 @@ class NewsService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return {
           'success': true,
-          'message': 'Actualité créée avec succès',
+          'message': 'Actualité créée avec succès et envoyée en modération',
           'news': jsonDecode(response.body),
         };
       } else {
@@ -133,13 +159,62 @@ class NewsService {
     int id,
     Map<String, dynamic> newsData,
   ) async {
-    print("NewsService: Mock updateNews $id");
-    return {'success': true};
+    try {
+      final token = await _getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'Non authentifié'};
+      }
+
+      final response = await http.patch(
+        Uri.parse('$baseUrl/api/news-api/$id/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $token',
+        },
+        body: jsonEncode(newsData),
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': 'Actualité modifiée avec succès',
+          'news': jsonDecode(response.body),
+        };
+      } else {
+        final error = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message': error['detail'] ?? 'Erreur lors de la modification',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Erreur réseau: $e'};
+    }
   }
 
   Future<Map<String, dynamic>> deleteNews(int id) async {
-    print("NewsService: Mock deleteNews $id");
-    return {'success': true};
+    try {
+      final token = await _getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'Non authentifié'};
+      }
+
+      final response = await http.delete(
+        Uri.parse('$baseUrl/api/news-api/$id/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $token',
+        },
+      );
+
+      if (response.statusCode == 204 || response.statusCode == 200) {
+        return {'success': true, 'message': 'Actualité supprimée avec succès'};
+      } else {
+        return {'success': false, 'message': 'Erreur lors de la suppression'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Erreur réseau: $e'};
+    }
   }
 
   Future<Map<String, dynamic>> moderateNews({
@@ -147,13 +222,84 @@ class NewsService {
     required String action,
     String? reason,
   }) async {
-    print("NewsService: Mock moderateNews $newsId - $action");
-    return {'success': true, 'message': 'Modération appliquée'};
+    try {
+      final token = await _getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'Non authentifié'};
+      }
+
+      // action peut être 'approve' ou 'reject'
+      final body = action == 'approve'
+          ? {'comment': reason ?? 'Approuvé'}
+          : {'reason': reason ?? 'Rejeté'};
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/news-api/$newsId/$action/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $token',
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return {
+          'success': true,
+          'message': data['message'] ?? 'Modération appliquée avec succès',
+        };
+      } else {
+        final error = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message':
+              error['error'] ??
+              error['detail'] ??
+              'Erreur lors de la modération',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Erreur réseau: $e'};
+    }
   }
 
   Future<Map<String, dynamic>> getPendingNews() async {
-    print("NewsService: Mock getPendingNews");
-    return {'success': true, 'news': <News>[]};
+    try {
+      final token = await _getToken();
+      if (token == null) {
+        return {'success': false, 'error': 'Non connecté'};
+      }
+
+      // Utiliser l'endpoint dédié pour les news en attente
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/news-api/pending/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        // L'endpoint /pending/ retourne directement un tableau
+        final List<dynamic> newsData = data is List
+            ? data
+            : (data['results'] ?? []);
+        final List<News> newsList = newsData
+            .map((json) => News.fromJson(json))
+            .toList();
+
+        return {'success': true, 'news': newsList, 'count': newsList.length};
+      } else {
+        return {
+          'success': false,
+          'error': 'Erreur de chargement des actualités en attente',
+        };
+      }
+    } catch (e) {
+      print("NewsService: Error getPendingNews - $e");
+      return {'success': false, 'error': 'Erreur de réseau: $e'};
+    }
   }
 
   Future<Map<String, dynamic>> getCategories() async {
@@ -233,21 +379,77 @@ class NewsService {
   }
 
   Future<Map<String, dynamic>> getMyNews() async {
-    print("NewsService: Mock getMyNews");
-    return {'success': true, 'news': <News>[]};
+    try {
+      final token = await _getToken();
+      if (token == null) {
+        return {'success': false, 'error': 'Non connecté'};
+      }
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/news/my/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<dynamic> newsData = data['results'] ?? [];
+        final List<News> newsList = newsData
+            .map((json) => News.fromJson(json))
+            .toList();
+
+        return {'success': true, 'news': newsList, 'count': data['count'] ?? 0};
+      } else {
+        return {
+          'success': false,
+          'error': 'Erreur de chargement de vos actualités',
+        };
+      }
+    } catch (e) {
+      print("NewsService: Error getMyNews - $e");
+      return {'success': false, 'error': 'Erreur de réseau: $e'};
+    }
   }
 
   Future<Map<String, dynamic>> getDashboardStats() async {
-    print("NewsService: Mock getDashboardStats");
-    return {
-      'success': true,
-      'stats': {
-        'totalNews': 0,
-        'pendingNews': 0,
-        'approvedNews': 0,
-        'rejectedNews': 0,
-      },
-    };
+    try {
+      final token = await _getToken();
+      if (token == null) {
+        return {'success': false, 'error': 'Non connecté'};
+      }
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/dashboard/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return {'success': true, 'stats': data};
+      } else {
+        return {
+          'success': false,
+          'error': 'Erreur de chargement des statistiques',
+        };
+      }
+    } catch (e) {
+      print("NewsService: Error getDashboardStats - $e");
+      return {
+        'success': false,
+        'error': 'Erreur de réseau: $e',
+        'stats': {
+          'totalNews': 0,
+          'pendingNews': 0,
+          'approvedNews': 0,
+          'rejectedNews': 0,
+        },
+      };
+    }
   }
 
   Future<List<News>> fetchNews({
@@ -259,8 +461,25 @@ class NewsService {
     int page = 1,
     int limit = 10,
   }) async {
-    print("NewsService: Mock fetchNews");
-    return [];
+    try {
+      final result = await getNews(
+        search: search,
+        category: category,
+        categoryId: categoryId,
+        importance: importance,
+        university: university,
+        page: page,
+        limit: limit,
+      );
+
+      if (result['success'] == true) {
+        return result['news'] as List<News>;
+      }
+      return [];
+    } catch (e) {
+      print("NewsService: Error fetchNews - $e");
+      return [];
+    }
   }
 
   Future<List<Category>> fetchCategories() async {

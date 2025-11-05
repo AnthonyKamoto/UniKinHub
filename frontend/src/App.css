@@ -1,21 +1,21 @@
 /* Styles pour l'application */
 .login-input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  box-sizing: border-box;
 }
 
 .login-label {
-    display: block;
-    margin-bottom: 8px;
-    color: #666;
+  display: block;
+  margin-bottom: 8px;
+  color: #666;
 }
 
 .simple-test {
-    padding: 20px;
-    background-color: lightblue;
-    text-align: center;
+  padding: 20px;
+  background-color: lightblue;
+  text-align: center;
 }

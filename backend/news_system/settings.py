@@ -10,15 +10,16 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Charger les variables d'environnement depuis .env
-load_dotenv(BASE_DIR / '.env')
+load_dotenv(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -31,7 +32,7 @@ SECRET_KEY = "django-insecure-1(t4n=_gio178p+ps_3#np&2l)srj5x4d3x^3fyi$0u7yecysx
 DEBUG = True
 
 # Accepter les connexions depuis localhost, émulateur Android et réseau local
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.0.2.2', '192.168.1.198', '*']
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "10.0.2.2", "192.168.1.198", "*"]
 
 
 # Application definition
@@ -134,16 +135,16 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Django REST Framework configuration
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
 }
 
 # CORS settings for Flutter mobile app
@@ -157,77 +158,111 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_ALL_ORIGINS = True  # For development only
 
 # Static files configuration
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Media files configuration
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Custom User Model
-AUTH_USER_MODEL = 'news.User'
+AUTH_USER_MODEL = "news.User"
 
 # Email configuration
 import os
 
 # Configuration par défaut (console pour développement)
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+)
 
 # Configuration pour le backend de fichiers
-if EMAIL_BACKEND == 'django.core.mail.backends.filebased.EmailBackend':
-    EMAIL_FILE_PATH = os.getenv('EMAIL_FILE_PATH', BASE_DIR / 'emails')
+if EMAIL_BACKEND == "django.core.mail.backends.filebased.EmailBackend":
+    EMAIL_FILE_PATH = os.getenv("EMAIL_FILE_PATH", BASE_DIR / "emails")
     # Créer le dossier s'il n'existe pas
     import pathlib
+
     pathlib.Path(EMAIL_FILE_PATH).mkdir(exist_ok=True)
 
 # Configuration SMTP (activée si EMAIL_BACKEND est défini)
-elif EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
-    EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-    EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
-    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
-    EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False').lower() == 'true'
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-    
+elif EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
+    EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+    EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+    EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() == "true"
+    EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
+    EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+    EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+
     if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
-        print("⚠️  AVERTISSEMENT: EMAIL_HOST_USER et EMAIL_HOST_PASSWORD doivent être configurés pour SMTP")
+        print(
+            "⚠️  AVERTISSEMENT: EMAIL_HOST_USER et EMAIL_HOST_PASSWORD doivent être configurés pour SMTP"
+        )
 
 # Configuration des emails système
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Actualités Étudiantes Kinshasa <noreply@etudiantskinshasa.com>')
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL",
+    "Actualités Étudiantes Kinshasa <noreply@etudiantskinshasa.com>",
+)
 SERVER_EMAIL = DEFAULT_FROM_EMAIL  # Pour les erreurs serveur
 
 # Timeout pour les emails (en secondes)
 EMAIL_TIMEOUT = 30
 
 # Site URL (for email links)
-SITE_URL = 'http://127.0.0.1:8000'
+SITE_URL = "http://127.0.0.1:8000"
 
 # Firebase Cloud Messaging (for push notifications)
-FCM_SERVER_KEY = 'your-fcm-server-key'  # À configurer
+FCM_SERVER_KEY = os.getenv(
+    "FCM_SERVER_KEY", "your-fcm-server-key"
+)  # Charger depuis .env
+FCM_PROJECT_ID = os.getenv("FCM_PROJECT_ID", "your-firebase-project-id")
+
+# Celery Configuration
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "Africa/Kinshasa"
+CELERY_ENABLE_UTC = True
+
+# Celery Beat Schedule (for periodic tasks)
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    "send-daily-digest": {
+        "task": "news.tasks.send_daily_digest_task",
+        "schedule": crontab(hour=8, minute=0),  # Tous les jours à 8h00
+    },
+    "send-weekly-digest": {
+        "task": "news.tasks.send_weekly_digest_task",
+        "schedule": crontab(day_of_week=1, hour=9, minute=0),  # Tous les lundis à 9h00
+    },
+}
 
 # Logging configuration
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'notifications.log',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "notifications.log",
         },
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
         },
     },
-    'loggers': {
-        'news.notification_service': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
-            'propagate': True,
+    "loggers": {
+        "news.notification_service": {
+            "handlers": ["file", "console"],
+            "level": "INFO",
+            "propagate": True,
         },
     },
 }

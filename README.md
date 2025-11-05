@@ -1,797 +1,299 @@
-# 📰 Système de Gestion d'Actualités Universitaires
+# 🎓 UniKinHub - Système de Gestion d'Actualités Universitaires
 
-**Projet N°3 - Fondation Children Coding Club**  
-**Développeur:** Anthony Kamoto  
-**Email:** <aanthonykamoto1@gmail.com>  
-**Version:** PI.10.25.FCCC-V003  
-**Date:** Octobre 2025
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Django](https://img.shields.io/badge/Django-5.2.7-green.svg)](https://www.djangoproject.com/)
+[![React](https://img.shields.io/badge/React-18.x-blue.svg)](https://reactjs.org/)
+[![Flutter](https://img.shields.io/badge/Flutter-3.35.6-blue.svg)](https://flutter.dev/)
+[![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
 
-Système centralisé de diffusion d'informations pour les étudiants des universités de Kinshasa (UNIKIN, UPN, etc.) avec application web et mobile.
-
----
-
-## 📋 Table des Matières
-
-1. [Vue d'ensemble](#-vue-densemble)
-2. [Fonctionnalités](#-fonctionnalités)
-3. [Architecture](#-architecture)
-4. [Technologies](#-technologies)
-5. [Prérequis](#-prérequis)
-6. [Installation](#-installation)
-7. [Démarrage](#-démarrage)
-8. [Utilisation](#-utilisation)
-9. [Structure du Projet](#-structure-du-projet)
-10. [Comptes de Test](#-comptes-de-test)
-11. [Guide de Test](#-guide-de-test)
-12. [API Documentation](#-api-documentation)
-13. [Démonstration](#-démonstration)
+> Plateforme centralisée de diffusion d'informations pour les étudiants des universités de Kinshasa avec modération complète et notifications en temps réel.
 
 ---
 
-## 🎯 Vue d'ensemble
+## ✨ Fonctionnalités Principales
 
-### Contexte
+### 📱 Pour les Étudiants
+- 📰 **Fil d'actualités personnalisé** selon le programme d'études
+- 🔔 **Notifications push** pour les nouvelles importantes
+- ❤️ **Interactions** - Likes et commentaires
+- 🔍 **Recherche avancée** avec filtres multiples
+- 📅 **Événements** avec rappels automatiques
 
-Dans les universités de Kinshasa, les informations (annonces, événements, messages) sont dispersées. Ce système centralise la diffusion d'actualités avec :
+### ✍️ Pour les Enseignants/Publiants
+- ✏️ **Création d'actualités** avec éditeur riche
+- 📸 **Upload d'images** et fichiers joints
+- 📊 **Statistiques** de lecture et engagement
+- 🎯 **Ciblage** par programme et université
 
-- Un site web de consultation
-- Une application mobile Android
-- Des notifications configurables (email et push)
-- Un système de modération des contenus
-
-### Objectifs
-
-- ✅ Centraliser la diffusion d'informations universitaires
-- ✅ Permettre la consultation web et mobile
-- ✅ Gérer les rôles et permissions (RBAC)
-- ✅ Modérer les contenus avant publication
-- ✅ Personnaliser les notifications par utilisateur
-
----
-
-## ✨ Fonctionnalités
-
-### Pour les Étudiants
-
-- 📱 Consultation des actualités (web et mobile)
-- 🔔 Notifications personnalisables (email/push)
-- 🔍 Filtres avancés (catégorie, importance, date, université)
-- ❤️ Like et interaction avec les actualités
-- 📊 Visualisation par programme/faculté
-
-### Pour les Publiants
-
-- ✍️ Création d'actualités avec images
-- 📝 Ciblage par université/faculté/département
-- 🔄 Modification des brouillons
-- 📈 Suivi du statut (brouillon, en attente, publié, rejeté)
-
-### Pour les Modérateurs
-
-- ✅ Validation ou rejet des actualités
-- 💬 Ajout de commentaires de modération
-- 📊 Statistiques de modération
-- 🔍 Vue des actualités en attente
-
-### Pour les Administrateurs
-
-- 👥 Gestion des utilisateurs et rôles
-- 🎓 Gestion des universités/facultés/départements
-- 📊 Statistiques globales du système
-- ⚙️ Configuration des paramètres
+### 🛡️ Pour les Modérateurs/Admins
+- ✅ **Système de modération** complet
+- 📋 **Tableau de bord** avec statistiques
+- 👥 **Gestion des utilisateurs** et rôles
+- 🔒 **Invalidation** de contenu publié
+- 📈 **Rapports** d'activité
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    FRONTEND APPLICATIONS                     │
-├──────────────────────────┬──────────────────────────────────┤
-│   React Web (Vite)       │   Flutter Mobile (Android)       │
-│   Port: 5173             │   Émulateur/Appareil            │
-└──────────────────────────┴──────────────────────────────────┘
-                            │
-                            ↓ HTTP/REST API
-┌─────────────────────────────────────────────────────────────┐
-│                    BACKEND (Django 5.2.7)                    │
-├─────────────────────────────────────────────────────────────┤
-│  • API REST (Django REST Framework)                         │
-│  • Authentification Token                                    │
-│  • RBAC (Role-Based Access Control)                         │
-│  • Gestion des médias (images)                              │
-│  • Système de notifications (email)                         │
-│  Port: 8000                                                  │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ↓
-┌─────────────────────────────────────────────────────────────┐
-│                  BASE DE DONNÉES (SQLite)                    │
-├─────────────────────────────────────────────────────────────┤
-│  • Utilisateurs et rôles                                     │
-│  • Actualités (news)                                         │
-│  • Catégories                                                │
-│  • Organisations (universités, facultés, départements)      │
-│  • Logs de modération                                        │
-└─────────────────────────────────────────────────────────────┘
+UniKinHub/
+├── 🐍 backend/          # API Django REST Framework
+├── ⚛️  frontend/         # Application Web React + TypeScript
+├── 📱 mobile/           # Application Mobile Flutter
+└── 📚 docs/             # Documentation complète
 ```
 
-### Diagramme Entité-Relation
-
-```
-┌─────────────┐         ┌──────────────┐         ┌─────────────┐
-│    Role     │         │     User     │         │  Universite │
-├─────────────┤         ├──────────────┤         ├─────────────┤
-│ id          │◄────┐   │ id           │    ┌───►│ id          │
-│ nom         │     └───│ role         │    │    │ nom         │
-│ permissions │         │ username     │    │    │ code        │
-└─────────────┘         │ email        │    │    └─────────────┘
-                        │ universite_id├────┘           │
-                        │ faculte_id   ├────┐           │
-                        │ departement  │    │    ┌──────▼─────┐
-                        └──────┬───────┘    │    │   Faculte  │
-                               │            │    ├────────────┤
-                               │            └───►│ id         │
-                        ┌──────▼────────┐       │ nom        │
-                        │     News      │       │ universite │
-                        ├───────────────┤       └────────────┘
-                        │ id            │              │
-                        │ title         │       ┌──────▼──────┐
-                        │ content       │       │ Departement │
-                        │ author_id     │       ├─────────────┤
-                        │ category_id   ├───┐   │ id          │
-                        │ status        │   │   │ nom         │
-                        │ importance    │   │   │ faculte     │
-                        │ image         │   │   └─────────────┘
-                        │ publish_date  │   │
-                        └───────────────┘   │
-                                            │
-                                     ┌──────▼────┐
-                                     │  Category │
-                                     ├───────────┤
-                                     │ id        │
-                                     │ name      │
-                                     │ color     │
-                                     └───────────┘
-```
-
----
-
-## 🛠️ Technologies
-
-### Backend
-
-- **Framework:** Django 5.2.7
-- **API:** Django REST Framework 3.15.2
-- **Base de données:** SQLite (développement) / PostgreSQL (production)
-- **Authentification:** Token-based authentication
-- **Gestion des médias:** Pillow
-- **Email:** SMTP (Gmail, SendGrid, etc.)
-
-### Frontend Web
-
-- **Framework:** React 18.3.1
-- **Build Tool:** Vite 4.5.14
-- **UI Library:** Material-UI (MUI) 5.18.0
-- **State Management:** React Context API
-- **Routing:** React Router DOM 6.30.1
-- **HTTP Client:** Axios 1.12.2
-- **Forms:** React Hook Form 7.65.0 + Zod 3.25.76
-
-### Mobile
-
-- **Framework:** Flutter 3.35.6
-- **Langage:** Dart
-- **State Management:** Provider
-- **HTTP Client:** http package
+**Stack Technique:**
+- **Backend:** Django 5.2.7 + DRF + Token Auth + Celery
+- **Frontend:** React 18 + TypeScript + Material-UI + Vite
+- **Mobile:** Flutter 3.35.6 + Provider + Material Design 3
+- **Base de données:** SQLite (dev) / PostgreSQL (prod)
 - **Notifications:** Firebase Cloud Messaging
-- **Local Storage:** SharedPreferences
-
-### DevOps
-
-- **Versioning:** Git + GitHub
-- **Scripts:** PowerShell (start-all.ps1, stop-all.ps1)
-- **Package Manager:** pnpm (frontend), pip (backend), pub (mobile)
+- **Tâches:** Celery + Redis
 
 ---
 
-## 📦 Prérequis
+## 🚀 Démarrage Rapide
 
-### Logiciels Requis
+### Prérequis
+- Python 3.12+
+- Node.js 18+ & pnpm
+- Flutter 3.35+
+- Git
 
-| Logiciel | Version Minimale | Vérification |
-|----------|------------------|--------------|
-| Python | 3.10+ | `python --version` |
-| Node.js | 18.0+ | `node --version` |
-| pnpm | 9.0+ | `pnpm --version` |
-| Flutter | 3.0+ | `flutter --version` |
-| Git | 2.0+ | `git --version` |
+### Installation en une commande
 
-### Optionnels
-
-- Android Studio (pour l'émulateur Android)
-- VS Code avec extensions : Python, Flutter, ESLint
-
-### Système d'exploitation
-
-- ✅ Windows 10/11
-- ✅ macOS 10.15+
-- ✅ Linux (Ubuntu 20.04+)
-
----
-
-## 🚀 Installation
-
-### 1. Cloner le Dépôt
-
-```bash
-git clone https://github.com/votre-repo/news-system.git
-cd news-system
-```
-
-### 2. Backend Django
-
+**Windows PowerShell:**
 ```powershell
-# Naviguer vers le dossier backend
-cd backend
-
-# Créer l'environnement virtuel Python
-python -m venv .venv
-
-# Activer l'environnement
-.\.venv\Scripts\Activate.ps1  # Windows
-# ou
-source .venv/bin/activate     # Linux/macOS
-
-# Installer les dépendances
-pip install -r requirements.txt
-
-# Créer la base de données
-python manage.py migrate
-
-# Créer un superutilisateur
-python manage.py createsuperuser
-
-# Peupler la base de données (optionnel)
-python populate_db.py
+.\setup.ps1
 ```
 
-### 3. Frontend React
-
+**Démarrage de tous les serveurs:**
 ```powershell
-# Naviguer vers le dossier frontend
-cd ../frontend
-
-# Installer les dépendances
-pnpm install
-```
-
-### 4. Mobile Flutter
-
-```powershell
-# Naviguer vers le dossier mobile
-cd ../mobile
-
-# Installer les dépendances
-flutter pub get
-
-# Vérifier l'installation
-flutter doctor
-```
-
-### 5. Configuration
-
-#### Backend (.env)
-
-Créer `backend/.env` :
-
-```env
-SECRET_KEY=votre-cle-secrete-django
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1,192.168.1.198
-
-# Configuration Email
-EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER=votre-email@gmail.com
-EMAIL_HOST_PASSWORD=votre-mot-de-passe-app
-```
-
-#### Frontend
-
-Aucune configuration requise (utilise <http://127.0.0.1:8000> par défaut)
-
-#### Mobile
-
-Modifier `mobile/lib/services/api_service.dart` si nécessaire :
-
-```dart
-static const String baseUrl = 'http://10.0.2.2:8000/api'; // Émulateur
-// ou
-static const String baseUrl = 'http://192.168.1.198:8000/api'; // Appareil physique
-```
-
----
-
-## 🎬 Démarrage
-
-### Option 1 : Démarrage Automatique (Recommandé)
-
-```powershell
-# Depuis la racine du projet
 .\start-all.ps1
 ```
 
-Ce script lance automatiquement :
+> **Accès:**
+> - 🌐 Web: http://localhost:3001
+> - 🔧 API: http://localhost:8000/api
+> - 📱 Mobile: Via émulateur Android
 
-- ✅ Backend Django (port 8000)
-- ✅ Frontend React (port 5173)
-- ✅ Émulateur Android + Application Flutter
+---
 
-### Option 2 : Démarrage Manuel
+## 📖 Documentation
 
-#### Backend
+| Guide | Description |
+|-------|-------------|
+| [📘 Installation](docs/INSTALLATION.md) | Guide d'installation détaillé |
+| [🚀 Démarrage](DEMARRAGE_RAPIDE.md) | Lancement rapide des serveurs |
+| [🔐 Authentification](docs/AUTHENTICATION.md) | Système d'auth et tokens |
+| [📡 API](docs/API.md) | Documentation API complète |
+| [🔔 Notifications](docs/NOTIFICATIONS_EMAIL.md) | Config email et push |
+| [🧪 Tests](docs/TESTING.md) | Guide de test et comptes |
+| [🏗️ Architecture](docs/ARCHITECTURE.md) | Architecture détaillée |
 
-```powershell
-cd backend
-.\.venv\Scripts\Activate.ps1
-python manage.py runserver 0.0.0.0:8000
-```
+---
 
-#### Frontend
+## 👤 Comptes de Test
 
-```powershell
-cd frontend
-pnpm dev
-```
+| Utilisateur | Username | Mot de passe | Rôle | Permissions |
+|-------------|----------|--------------|------|-------------|
+| Admin | `admin` | `admin123` | Administrateur | Gestion complète |
+| Modérateur 1 | `moderateur1` | `password123` | Modérateur | Modération de contenu |
+| Modérateur 2 | `moderateur2` | `password123` | Modérateur | Modération de contenu |
+| Enseignant | `enseignant1` | `password123` | Publiant | Création actualités |
+| Étudiant 1 | `etudiant1` | `password123` | Étudiant | Lecture + Interactions |
+| Étudiant 2 | `etudiant2` | `password123` | Étudiant | Lecture + Interactions |
 
-#### Mobile
+> **Détails complets:** Voir [COMPTES_UTILISATEURS.txt](COMPTES_UTILISATEURS.txt)
 
-```powershell
-cd mobile
-flutter emulators --launch Medium_Phone_API_36.1  # Lancer l'émulateur
-flutter run -d emulator-5554
-```
+---
 
-### Arrêter les Serveurs
+## 🧪 Test du Workflow
 
-```powershell
-.\stop-all.ps1
+### Workflow de Modération
+
+1. **Connexion en tant que publiant:**
+   ```
+   Username: enseignant1
+   Password: password123
+   ```
+
+2. **Créer une actualité:**
+   - Titre, contenu, catégorie, importance
+   - Upload image (optionnel)
+   - Soumettre → Status: `pending`
+
+3. **Connexion en tant que modérateur:**
+   ```
+   Username: moderateur1
+   Password: password123
+   ```
+
+4. **Modérer l'actualité:**
+   - Voir liste des news en attente
+   - Approuver ✅ ou Rejeter ❌
+   - Status après approbation: `published`
+
+### Test via API
+
+```bash
+# Création news (enseignant1)
+curl -X POST http://localhost:8000/api/api/news-api/ \
+  -H "Authorization: Token {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_title": "Test",
+    "draft_content": "Contenu",
+    "category": 1
+  }'
+
+# Liste news en attente (admin/moderateur)
+curl http://localhost:8000/api/api/news-api/pending/ \
+  -H "Authorization: Token {token}"
+
+# Approbation (admin/moderateur)
+curl -X POST http://localhost:8000/api/api/news-api/{id}/approve/ \
+  -H "Authorization: Token {token}" \
+  -H "Content-Type: application/json" \
+  -d '{"comment": "Approuvé"}'
 ```
 
 ---
 
-## 👥 Comptes de Test
-
-Voir le fichier `COMPTES_UTILISATEURS.txt` pour la liste complète.
-
-### Accès Rapides
-
-| Rôle | Username | Password | Email |
-|------|----------|----------|-------|
-| **Administrateur** | admin | admin123 | <admin@example.com> |
-| **Modérateur** | moderateur1 | password123 | <mod1@unikin.ac.cd> |
-| **Publiant** | publiant1 | password123 | <pub1@upn.ac.cd> |
-| **Étudiant** | etudiant1 | password123 | <etud1@unikin.ac.cd> |
-
----
-
-## 📖 Utilisation
-
-### Accès aux Applications
-
-- **Backend Admin:** <http://127.0.0.1:8000/admin>
-- **Backend API:** <http://127.0.0.1:8000/api>
-- **Frontend Web:** <http://localhost:5173>
-- **Mobile:** Sur émulateur ou appareil Android
-
-### Workflow Typique
-
-#### 1. En tant qu'Étudiant
+## 📦 Structure du Projet
 
 ```
-1. Se connecter (username: etudiant1, password: password123)
-2. Consulter les actualités sur la page d'accueil
-3. Filtrer par catégorie, importance, ou université
-4. Liker une actualité
-5. Configurer les préférences de notification
-```
-
-#### 2. En tant que Publiant
-
-```
-1. Se connecter (username: publiant1, password: password123)
-2. Cliquer sur "Créer une actualité"
-3. Remplir le formulaire :
-   - Titre et contenu
-   - Catégorie et importance
-   - Ajouter une image (optionnel)
-   - Cibler université/faculté/département
-4. Soumettre pour modération
-5. Voir le statut dans "Mes actualités"
-```
-
-#### 3. En tant que Modérateur
-
-```
-1. Se connecter (username: moderateur1, password: password123)
-2. Accéder à "Modération" dans le menu
-3. Consulter les actualités en attente
-4. Approuver ou rejeter avec commentaire
-5. Voir les statistiques de modération
-```
-
-#### 4. En tant qu'Administrateur
-
-```
-1. Se connecter (username: admin, password: admin123)
-2. Accéder au panel d'administration (web: /admin)
-3. Gérer les utilisateurs, rôles, et permissions
-4. Créer/modifier universités, facultés, départements
-5. Voir les statistiques globales
-```
-
----
-
-## 📁 Structure du Projet
-
-```
-MiniProjet_N3_CCC_AnthonyKamoto/
-├── backend/                    # Backend Django
-│   ├── news/                   # Application principale
-│   │   ├── models.py          # Modèles de données
-│   │   ├── views.py           # Vues API
-│   │   ├── serializers.py     # Sérialiseurs DRF
-│   │   ├── urls.py            # Routes API
-│   │   └── admin.py           # Configuration admin
-│   ├── news_system/           # Configuration Django
-│   │   ├── settings.py        # Paramètres
-│   │   └── urls.py            # URLs principales
-│   ├── media/                 # Fichiers médias (images)
-│   ├── static/                # Fichiers statiques
-│   ├── templates/             # Templates HTML
-│   ├── manage.py              # Script Django
-│   ├── requirements.txt       # Dépendances Python
-│   ├── populate_db.py         # Script de peuplement
-│   └── db.sqlite3             # Base de données
+UniKinHub/
 │
-├── frontend/                  # Frontend React
+├── backend/                    # Backend Django
+│   ├── news/                   # App principale
+│   │   ├── models.py          # Modèles de données
+│   │   ├── serializers.py     # Serializers DRF
+│   │   ├── views.py           # Vues API
+│   │   ├── views_moderation.py # Endpoints modération
+│   │   ├── permissions.py     # Permissions RBAC
+│   │   └── tasks.py           # Tâches Celery
+│   ├── news_system/           # Configuration Django
+│   └── manage.py
+│
+├── frontend/                   # Frontend React
 │   ├── src/
 │   │   ├── components/        # Composants réutilisables
-│   │   ├── pages/             # Pages de l'application
-│   │   ├── contexts/          # Contexts React (AuthContext)
-│   │   ├── services/          # Services API (axios)
-│   │   ├── types/             # Types TypeScript
-│   │   └── main.tsx           # Point d'entrée
-│   ├── public/                # Assets publics
-│   ├── package.json           # Dépendances npm
-│   ├── vite.config.ts         # Configuration Vite
-│   └── tsconfig.json          # Configuration TypeScript
+│   │   ├── pages/            # Pages principales
+│   │   ├── services/         # Services API
+│   │   ├── contexts/         # Contextes React
+│   │   └── theme/            # Configuration MUI
+│   └── package.json
 │
-├── mobile/                    # Application Flutter
+├── mobile/                     # Application Flutter
 │   ├── lib/
-│   │   ├── models/            # Modèles de données
-│   │   ├── providers/         # State management (Provider)
-│   │   ├── screens/           # Écrans de l'application
-│   │   ├── services/          # Services API
-│   │   ├── widgets/           # Widgets réutilisables
-│   │   └── main.dart          # Point d'entrée
-│   ├── android/               # Configuration Android
-│   ├── ios/                   # Configuration iOS
-│   ├── pubspec.yaml           # Dépendances Flutter
-│   └── README.md              # Documentation mobile
+│   │   ├── models/           # Modèles de données
+│   │   ├── screens/          # Écrans
+│   │   ├── services/         # Services API
+│   │   ├── providers/        # State management
+│   │   └── widgets/          # Widgets réutilisables
+│   └── pubspec.yaml
 │
-├── docs/                      # Documentation
-│   ├── INSTALLATION.md        # Guide d'installation
-│   ├── README.md              # Documentation générale
-│   └── SMTP_CONFIGURATION.md  # Configuration email
+├── docs/                       # Documentation
+│   ├── INSTALLATION.md        # Guide installation
+│   ├── API.md                # Documentation API
+│   └── ...
 │
-├── start-all.ps1              # Script de démarrage
-├── stop-all.ps1               # Script d'arrêt
-├── COMPTES_UTILISATEURS.txt   # Liste des comptes de test
-├── Projet_N3_Fondation_CCC.md # Spécifications du projet
-└── README.md                  # Ce fichier
+├── setup.ps1                  # Script installation
+├── start-all.ps1             # Démarrage serveurs
+├── stop-all.ps1              # Arrêt serveurs
+└── README.md                 # Ce fichier
 ```
 
 ---
 
-## 🧪 Guide de Test
+## 🔧 Configuration
 
-### Tests Fonctionnels
+### Variables d'Environnement
 
-#### 1. Authentification
+Créer un fichier `.env` à la racine :
 
-- [ ] Connexion avec un compte existant
-- [ ] Connexion avec des identifiants incorrects
-- [ ] Inscription d'un nouveau compte
-- [ ] Déconnexion
+```env
+# Django
+SECRET_KEY=your-secret-key
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
 
-#### 2. Gestion des Actualités
+# Base de données
+DATABASE_URL=sqlite:///db.sqlite3
 
-- [ ] Création d'une actualité (publiant)
-- [ ] Ajout d'une image à une actualité
-- [ ] Modification d'un brouillon
-- [ ] Suppression d'une actualité
-- [ ] Filtrage par catégorie
-- [ ] Filtrage par importance
-- [ ] Filtrage par date
-- [ ] Recherche par mot-clé
+# Email
+EMAIL_BACKEND=django.core.mail.backends.filebased.EmailBackend
+EMAIL_FILE_PATH=emails
 
-#### 3. Modération
-
-- [ ] Voir la liste des actualités en attente
-- [ ] Approuver une actualité
-- [ ] Rejeter une actualité avec commentaire
-- [ ] Voir les statistiques de modération
-
-#### 4. Interactions
-
-- [ ] Liker une actualité
-- [ ] Retirer un like
-- [ ] Voir le nombre de vues
-- [ ] Partager une actualité (mobile)
-
-#### 5. Notifications
-
-- [ ] Configurer la fréquence des emails
-- [ ] Recevoir une notification push (mobile)
-- [ ] Désactiver les notifications
-
-#### 6. Administration
-
-- [ ] Créer un utilisateur
-- [ ] Modifier les rôles
-- [ ] Créer une université/faculté/département
-- [ ] Voir les statistiques globales
-
-### Tests Techniques
-
-#### Backend
-
-```powershell
-cd backend
-.\.venv\Scripts\Activate.ps1
-python manage.py test
+# Firebase (optionnel)
+FCM_SERVER_KEY=your-firebase-server-key
+FCM_PROJECT_ID=your-project-id
 ```
-
-#### Frontend
-
-```powershell
-cd frontend
-pnpm test
-```
-
-#### Mobile
-
-```powershell
-cd mobile
-flutter test
-```
-
-### Scénarios de Test
-
-#### Scénario 1 : Publication d'une actualité complète
-
-```
-1. Connexion en tant que publiant (publiant1)
-2. Créer une actualité avec image
-3. Soumettre pour modération
-4. Déconnexion
-5. Connexion en tant que modérateur (moderateur1)
-6. Approuver l'actualité
-7. Déconnexion
-8. Connexion en tant qu'étudiant (etudiant1)
-9. Vérifier que l'actualité apparaît
-10. Liker l'actualité
-```
-
-#### Scénario 2 : Rejet et modification
-
-```
-1. Publiant crée une actualité
-2. Modérateur rejette avec commentaire
-3. Publiant modifie et resoumet
-4. Modérateur approuve
-```
-
----
-
-## 📡 API Documentation
-
-### Base URL
-
-```
-http://127.0.0.1:8000/api
-```
-
-### Authentification
-
-Toutes les requêtes authentifiées nécessitent un header :
-
-```
-Authorization: Token <votre_token>
-```
-
-### Endpoints Principaux
-
-#### Authentification
-
-```http
-POST /api/auth/login/
-Body: { "username": "string", "password": "string" }
-Response: { "token": "string", "user": {...} }
-
-POST /api/auth/logout/
-Response: { "message": "Déconnexion réussie" }
-
-GET /api/auth/me/
-Response: { "id": int, "username": "string", ... }
-```
-
-#### Actualités
-
-```http
-GET /api/news/
-Query Params: ?category=1&importance=high&search=mot
-Response: { "results": [...], "count": int }
-
-GET /api/news/{id}/
-Response: { "id": int, "title": "string", ... }
-
-POST /api/news/create/
-Body: FormData { title, content, category, image (file) }
-Response: { "id": int, "title": "string", ... }
-```
-
-#### Catégories
-
-```http
-GET /api/categories/
-Response: [{ "id": int, "name": "string", "color": "#hex" }]
-```
-
-#### Rôles et Organisations
-
-```http
-GET /api/roles/
-GET /api/universites/
-GET /api/facultes/?universite=1
-GET /api/departements/?faculte=1
-```
-
-#### Modération
-
-```http
-GET /api/admin/news/pending/
-Response: [{ "id": int, "title": "string", "status": "pending" }]
-
-POST /api/admin/news/{id}/moderate/
-Body: { "action": "approve|reject" }
-```
-
----
-
-## 🎥 Démonstration
-
-### Screenshots
-
-#### Interface Web
-
-![Page d'accueil](docs/screenshots/home-web.png)
-![Création d'actualité](docs/screenshots/create-news-web.png)
-![Modération](docs/screenshots/moderation-web.png)
-
-#### Application Mobile
-
-![Accueil Mobile](docs/screenshots/home-mobile.png)
-![Filtres](docs/screenshots/filters-mobile.png)
-![Profil](docs/screenshots/profile-mobile.png)
-
-### Vidéo de Démonstration
-
-Lien vers la vidéo : [YouTube/Drive]
-
----
-
-## 📚 Documentation Complémentaire
-
-- [Guide d'Installation Détaillé](docs/INSTALLATION.md)
-- [Configuration SMTP](docs/SMTP_CONFIGURATION.md)
-- [Connexion API Mobile](docs/MOBILE_API_CONNECTION.md)
-- [Notifications Email](docs/NOTIFICATIONS_EMAIL.md)
 
 ---
 
 ## 🤝 Contribution
 
-### Équipe de Développement
+Les contributions sont les bienvenues ! Veuillez suivre ces étapes :
 
-- **Encadrant:** DIOGO NORMAN Nono
-- **Développeur:** Anthony Kamoto (<aanthonykamoto1@gmail.com>)
-- **Organisation:** Fondation Children Coding Club
-
-### Workflow Git
-
-```bash
-# Créer une branche pour une nouvelle fonctionnalité
-git checkout -b feature/nouvelle-fonctionnalite
-
-# Faire des commits réguliers
-git add .
-git commit -m "Description des changements"
-
-# Pousser vers le dépôt
-git push origin feature/nouvelle-fonctionnalite
-```
+1. Fork le projet
+2. Créer une branche (`git checkout -b feature/AmazingFeature`)
+3. Commit les changements (`git commit -m 'Add AmazingFeature'`)
+4. Push vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrir une Pull Request
 
 ---
 
-## 🐛 Dépannage
+## 📝 Changelog
 
-### Problèmes Courants
+### Version 1.0.0 (Nov 2025)
+- ✅ Système de modération complet
+- ✅ Applications web et mobile fonctionnelles
+- ✅ Notifications email et push
+- ✅ RBAC avec 4 rôles
+- ✅ Workflow de validation
+- ✅ Tests complets
 
-#### Backend ne démarre pas
-
-```powershell
-# Vérifier que l'environnement virtuel est activé
-.\.venv\Scripts\Activate.ps1
-
-# Vérifier les dépendances
-pip install -r requirements.txt
-
-# Vérifier les migrations
-python manage.py migrate
-```
-
-#### Frontend ne se lance pas
-
-```powershell
-# Réinstaller les dépendances
-pnpm install
-
-# Vérifier le port 5173 n'est pas utilisé
-netstat -ano | findstr :5173
-```
-
-#### Mobile ne compile pas
-
-```powershell
-# Nettoyer et récupérer les dépendances
-flutter clean
-flutter pub get
-
-# Vérifier la configuration
-flutter doctor
-```
-
-#### Erreur 404 sur les images
-
-Vérifier que le dossier `backend/media/news/images/` existe et que `MEDIA_URL` est configuré dans Django.
+Voir [CHANGELOG.md](docs/CHANGELOG.md) pour l'historique complet.
 
 ---
 
 ## 📄 Licence
 
-Ce projet est développé dans le cadre du programme de formation de la **Fondation Children Coding Club**.
+Ce projet est sous licence MIT. Voir [LICENSE](LICENSE) pour plus de détails.
 
 ---
 
-## 📞 Contact
-
-### Développeur du Projet
+## 👨‍💻 Auteur
 
 **Anthony Kamoto**  
-Email: <aanthonykamoto1@gmail.com>  
-GitHub: [Anthony Kamoto](https://github.com/anthonykamoto)
-
-### Organisation
-
-**Fondation Children Coding Club**
+📧 Email: aanthonykamoto1@gmail.com  
+🏢 Organisation: Fondation Children Coding Club  
+📅 Projet N°3 - Octobre 2025
 
 ---
 
-**Dernière mise à jour:** 29 Octobre 2025  
-**Version:** 1.0.0  
-**Développé par:** Anthony Kamoto
+## 🙏 Remerciements
+
+- Fondation Children Coding Club
+- Universités de Kinshasa (UNIKIN, UPN)
+- Communauté Django, React et Flutter
+
+---
+
+## 📞 Support
+
+Pour toute question ou problème :
+- 📧 Email: aanthonykamoto1@gmail.com
+- 📚 Documentation: [docs/](docs/)
+- 🐛 Issues: [GitHub Issues](https://github.com/AnthonyKamoto/UniKinHub/issues)
+
+---
+
+<div align="center">
+  <p>Fait avec ❤️ pour les étudiants de Kinshasa</p>
+  <p>© 2025 Anthony Kamoto - Tous droits réservés</p>
+</div>

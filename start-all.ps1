@@ -102,6 +102,16 @@ if (Test-Command "flutter") {
     Write-StatusWarning "Flutter n'est pas installé ou n'est pas dans le PATH"
 }
 
+# Vérifier Redis (optionnel pour notifications)
+$script:redisInstalled = Test-Command "redis-server"
+if ($redisInstalled) {
+    Write-StatusOK "Redis installé (notifications automatiques activées)"
+} else {
+    Write-StatusWarning "Redis non installé (notifications planifiées désactivées)"
+    Write-StatusInfo "Pour activer les notifications quotidiennes/hebdomadaires:"
+    Write-StatusInfo "  Installez Redis: https://github.com/tporadowski/redis/releases"
+}
+
 Write-Host ""
 
 # Arrêter si des erreurs critiques
@@ -117,30 +127,50 @@ if ($ErrorCount -gt 0) {
 # =============================================================================
 Write-Host "🐍 Préparation du Backend Django..." -ForegroundColor Cyan
 
-# Vérifier l'environnement virtuel
-if (Test-Path $venvPath) {
-    Write-StatusOK "Environnement virtuel Python détecté"
+# Vérifier l'environnement virtuel (à la racine du projet)
+$venvDir = ".venv"
+if (Test-Path $venvDir) {
+    Write-StatusOK "Environnement virtuel Python détecté (racine)"
 } else {
-    Write-StatusWarning "Environnement virtuel non trouvé"
-    Write-StatusInfo "Création de l'environnement virtuel..."
-    
-    Push-Location $backendPath
-    try {
-        python -m venv .venv
-        Write-StatusOK "Environnement virtuel créé"
-    } catch {
-        Write-StatusError "Erreur lors de la création de l'environnement virtuel"
-    }
-    Pop-Location
+    Write-StatusError "Environnement virtuel non trouvé à la racine du projet"
+    Write-StatusInfo "Veuillez créer un environnement virtuel: python -m venv .venv"
+    exit 1
 }
 
-# Commandes pour le backend (avec activation venv et migrations)
-# Utiliser cmd avec activation batch de venv pour éviter les problèmes ExecutionPolicy
-$backendFullPath = Join-Path (Get-Location) $backendPath
-$backendCommands = "cd /d `"$backendFullPath`" && echo Activation environnement virtuel Python... && call .venv\Scripts\activate.bat && echo Installation des dependances Python... && pip install -q -r requirements.txt && echo Execution des migrations Django... && python manage.py migrate --no-input && echo Demarrage du serveur Django (http://localhost:8000)... && python manage.py runserver 0.0.0.0:8000"
+# Démarrer Redis si disponible
+if ($redisInstalled) {
+    Write-StatusInfo "Démarrage de Redis..."
+    Start-Process redis-server -WindowStyle Minimized
+    Start-Sleep -Seconds 2
+}
+
+# Commandes pour le backend (utilisation directe de python.exe du venv depuis la racine)
+$rootPath = Get-Location
+$backendFullPath = Join-Path $rootPath $backendPath
+$pythonExe = Join-Path $rootPath ".venv\Scripts\python.exe"
+$backendCommands = "cd /d `"$backendFullPath`" && echo Execution des migrations Django... && `"$pythonExe`" manage.py migrate --no-input && echo Demarrage du serveur Django (http://localhost:8000)... && `"$pythonExe`" manage.py runserver 0.0.0.0:8000"
 
 Write-StatusInfo "Lancement du serveur Django..."
 Start-Process cmd -ArgumentList "/k", $backendCommands
+
+# Attendre que Django démarre avant de lancer Celery
+if ($redisInstalled) {
+    Write-StatusInfo "Attente du démarrage de Django (5 secondes)..."
+    Start-Sleep -Seconds 5
+    
+    # Démarrer Celery Worker
+    Write-StatusInfo "Démarrage de Celery Worker (notifications)..."
+    $celeryExe = Join-Path $rootPath ".venv\Scripts\celery.exe"
+    $celeryWorkerCmd = "cd /d `"$backendFullPath`" && echo Demarrage Celery Worker... && `"$celeryExe`" -A news_system worker --loglevel=info --pool=solo"
+    Start-Process cmd -ArgumentList "/k", $celeryWorkerCmd
+    
+    Start-Sleep -Seconds 2
+    
+    # Démarrer Celery Beat
+    Write-StatusInfo "Démarrage de Celery Beat (planificateur)..."
+    $celeryBeatCmd = "cd /d `"$backendFullPath`" && echo Demarrage Celery Beat... && `"$celeryExe`" -A news_system beat --loglevel=info"
+    Start-Process cmd -ArgumentList "/k", $celeryBeatCmd
+}
 
 Write-Host ""
 
@@ -293,10 +323,27 @@ Write-Host "   🔹 Admin Django : http://localhost:8000/admin" -ForegroundColor
 Write-Host "   🔹 Frontend Web : http://localhost:5173" -ForegroundColor White
 Write-Host "   🔹 Mobile       : Sur l'émulateur/appareil connecté" -ForegroundColor White
 Write-Host ""
-Write-Host "💡 Conseils :" -ForegroundColor Yellow
+Write-Host "� Services de notifications :" -ForegroundColor Cyan
+if ($redisInstalled) {
+    Write-Host "   ✅ Redis : Actif" -ForegroundColor Green
+    Write-Host "   ✅ Celery Worker : Actif (traitement des tâches)" -ForegroundColor Green
+    Write-Host "   ✅ Celery Beat : Actif (notifications à 8h et lundi 9h)" -ForegroundColor Green
+    Write-Host "   • Notifications immédiates : Envoyées dès la publication" -ForegroundColor White
+    Write-Host "   • Notifications quotidiennes : Tous les jours à 8h00" -ForegroundColor White
+    Write-Host "   • Notifications hebdomadaires : Tous les lundis à 9h00" -ForegroundColor White
+} else {
+    Write-Host "   ⚠️  Redis : Non installé" -ForegroundColor Yellow
+    Write-Host "   • Notifications immédiates : Actives" -ForegroundColor White
+    Write-Host "   • Notifications planifiées : Désactivées (Redis requis)" -ForegroundColor Gray
+}
+Write-Host ""
+Write-Host "�💡 Conseils :" -ForegroundColor Yellow
 Write-Host "   • Les serveurs tournent dans des fenêtres séparées" -ForegroundColor Gray
 Write-Host "   • Utilisez Ctrl+C dans chaque fenêtre pour arrêter un serveur" -ForegroundColor Gray
 Write-Host "   • Consultez les logs dans chaque fenêtre en cas d'erreur" -ForegroundColor Gray
+if (-not $redisInstalled) {
+    Write-Host "   • Pour activer les notifications planifiées, installez Redis" -ForegroundColor Gray
+}
 Write-Host ""
 Write-Host "📌 Pour le mobile : Assurez-vous qu'un émulateur est démarré !" -ForegroundColor Yellow
 Write-Host ""

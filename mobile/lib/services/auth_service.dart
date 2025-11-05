@@ -46,7 +46,7 @@ class AuthService {
 
         // Sauvegarder le token et les données utilisateur
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('access_token', data['token']);
+        await prefs.setString('auth_token', data['token']);
         await prefs.setString('user_data', jsonEncode(data['user']));
 
         return {
@@ -185,7 +185,7 @@ class AuthService {
 
   Future<bool> isLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('access_token') != null;
+    return prefs.getString('auth_token') != null;
   }
 
   Future<User?> getSavedUser() async {
@@ -312,7 +312,7 @@ class AuthService {
 
   Future<String?> getAccessToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('access_token');
+    return prefs.getString('auth_token');
   }
 
   Future<String?> getToken() async {
@@ -321,7 +321,7 @@ class AuthService {
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('access_token');
+    await prefs.remove('auth_token');
     await prefs.remove('refresh_token');
     await prefs.remove('user_data');
   }

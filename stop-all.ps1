@@ -3,6 +3,26 @@
 Write-Host "🛑 ARRÊT DE TOUS LES SERVEURS" -ForegroundColor Red
 Write-Host "=" * 60
 
+# Arrêter Redis
+Write-Host "`n🔴 Arrêt de Redis..." -ForegroundColor Yellow
+$redisProcesses = Get-Process -Name redis-server -ErrorAction SilentlyContinue
+if ($redisProcesses) {
+    $redisProcesses | Stop-Process -Force
+    Write-Host "✅ Redis arrêté" -ForegroundColor Green
+} else {
+    Write-Host "ℹ️  Aucun processus Redis en cours" -ForegroundColor Gray
+}
+
+# Arrêter Celery
+Write-Host "`n🔔 Arrêt de Celery..." -ForegroundColor Yellow
+$celeryProcesses = Get-Process -Name celery -ErrorAction SilentlyContinue
+if ($celeryProcesses) {
+    $celeryProcesses | Stop-Process -Force
+    Write-Host "✅ Celery arrêté" -ForegroundColor Green
+} else {
+    Write-Host "ℹ️  Aucun processus Celery en cours" -ForegroundColor Gray
+}
+
 # Arrêter les processus Python (Django)
 Write-Host "`n🐍 Arrêt du serveur Django..." -ForegroundColor Yellow
 $pythonProcesses = Get-Process -Name python -ErrorAction SilentlyContinue

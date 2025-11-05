@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../models/user.dart';
 import '../services/auth_service.dart';
+import '../services/notification_service.dart';
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -65,6 +66,16 @@ class AuthProvider with ChangeNotifier {
       if (result['success']) {
         _currentUser = result['user'];
         _isLoggedIn = true;
+
+        // Enregistrer le token FCM après connexion réussie
+        try {
+          await NotificationService.instance.registerToken();
+          print('FCM token registered after login');
+        } catch (e) {
+          print('Failed to register FCM token: $e');
+          // Ne pas bloquer la connexion si l'enregistrement du token échoue
+        }
+
         notifyListeners();
         return true;
       } else {
@@ -172,6 +183,14 @@ class AuthProvider with ChangeNotifier {
     _setLoading(true);
 
     try {
+      // Désenregistrer le token FCM avant déconnexion
+      try {
+        await NotificationService.instance.unregisterToken();
+        print('FCM token unregistered on logout');
+      } catch (e) {
+        print('Failed to unregister FCM token: $e');
+      }
+
       await _authService.logout();
     } catch (e) {
       print('Erreur lors de la déconnexion: $e');

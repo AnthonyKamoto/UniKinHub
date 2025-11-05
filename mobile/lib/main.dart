@@ -1,17 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'providers/news_provider.dart';
 import 'providers/auth_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Application démarrée en mode simplifié sans Firebase
-  print('Application démarrée en mode simplifié');
+  try {
+    // Initialiser Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print('Firebase initialized successfully');
 
-  runApp(const NewsApp(firebaseEnabled: false));
+    // Initialiser les notifications
+    await NotificationService.instance.initialize();
+    print('Notifications initialized successfully');
+
+    runApp(const NewsApp(firebaseEnabled: true));
+  } catch (e) {
+    print('Error initializing Firebase: $e');
+    // Lancer l'app sans Firebase en cas d'erreur
+    runApp(const NewsApp(firebaseEnabled: false));
+  }
 }
 
 class NewsApp extends StatelessWidget {

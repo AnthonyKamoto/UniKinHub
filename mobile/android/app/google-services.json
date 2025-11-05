@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "442450368253",
+    "project_id": "notification-push-unikinhub",
+    "storage_bucket": "notification-push-unikinhub.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:442450368253:android:3ebcf68a963f2f526d1094",
+        "android_client_info": {
+          "package_name": "com.example.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJ1xyeBHdU36FmNg105Qc2Nrq6WES42n4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
