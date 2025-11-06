@@ -105,6 +105,30 @@ class NewsViewSet(viewsets.ModelViewSet):
         # Par défaut : toutes les news publiées
         return queryset.filter(status="published")
 
+    def create(self, request, *args, **kwargs):
+        """Créer une news et retourner un objet complet"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        news = serializer.save(author=request.user)
+
+        # Envoyer confirmation de soumission
+        try:
+            NotificationService.send_submission_confirmation(news)
+        except Exception as e:
+            print(f"Erreur notification: {e}")
+
+        # Si la news est déjà publiée (admin/modérateur), envoyer les notifications
+        if news.status == "published":
+            try:
+                notify_on_news_published_task.delay(news.id)
+            except Exception as e:
+                print(f"Erreur tâche Celery: {e}")
+
+        # Retourner le serializer complet pour la réponse
+        response_serializer = NewsSerializer(news)
+        headers = self.get_success_headers(response_serializer.data)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
     def perform_create(self, serializer):
         """Créer une news en assignant l'auteur"""
         news = serializer.save(author=self.request.user)

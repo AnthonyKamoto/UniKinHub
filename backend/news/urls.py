@@ -12,7 +12,7 @@ router.register(r"news-api", NewsViewSet, basename="news-api")
 
 urlpatterns = [
     # ViewSets API (nouvelle architecture)
-    path("api/", include(router.urls)),
+    path("", include(router.urls)),
     # Routes existantes (compatibilité)
     # Authentification
     path("auth/login/", views.LoginAPIView.as_view(), name="login"),
