@@ -153,7 +153,7 @@ class User(AbstractUser):
         related_name="utilisateurs",
     )
     promotion = models.CharField(
-        max_length=20, blank=True, help_text="Ex: L1, L2, M1, M2..."
+        max_length=50, blank=True, help_text="Ex: L1, L2, M1, M2..."
     )
 
     # NOUVEAU: Informations de vérification
