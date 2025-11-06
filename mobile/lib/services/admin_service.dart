@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 
 class AdminService {
-  static const String baseUrl = 'http://127.0.0.1:8000';
+  static const String baseUrl = 'http://10.0.2.2:8000';
 
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();

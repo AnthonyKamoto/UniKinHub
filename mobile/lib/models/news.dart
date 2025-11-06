@@ -108,8 +108,8 @@ class News {
       targetPrograms: List<String>.from(json['target_programs'] ?? []),
       viewsCount: json['views_count'] ?? 0,
       likesCount: json['likes_count'] ?? 0,
-      image: json['image'],
-      attachment: json['attachment'],
+      image: (json['image'] as String?),
+      attachment: (json['attachment'] as String?),
       isLiked: json['is_liked'] ?? false,
       timeSince: (json['time_since'] as String?) ?? '',
     );

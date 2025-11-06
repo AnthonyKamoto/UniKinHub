@@ -5,7 +5,7 @@ import '../models/news.dart';
 import '../models/category.dart';
 
 class NewsService {
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static const String baseUrl = 'http://10.0.2.2:8000/api';
 
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -83,7 +83,7 @@ class NewsService {
       }
 
       final response = await http.get(
-        Uri.parse('$baseUrl/api/news-api/$id/'),
+        Uri.parse('$baseUrl/news-api/$id/'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Token $token',
@@ -128,10 +128,11 @@ class NewsService {
         'programme_ou_formation': program ?? '',
         'target_universities': <String>[],
         'target_programs': <String>[],
+        if (imageUrl != null && imageUrl.isNotEmpty) 'image': imageUrl,
       };
 
       final response = await http.post(
-        Uri.parse('$baseUrl/api/news-api/'),
+        Uri.parse('$baseUrl/news-api/'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Token $token',
@@ -167,8 +168,8 @@ class NewsService {
         return {'success': false, 'message': 'Non authentifié'};
       }
 
-      final response = await http.patch(
-        Uri.parse('$baseUrl/api/news-api/$id/'),
+      final response = await http.put(
+        Uri.parse('$baseUrl/news-api/$id/'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Token $token',
@@ -202,7 +203,7 @@ class NewsService {
       }
 
       final response = await http.delete(
-        Uri.parse('$baseUrl/api/news-api/$id/'),
+        Uri.parse('$baseUrl/news-api/$id/'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Token $token',
@@ -236,7 +237,7 @@ class NewsService {
           : {'reason': reason ?? ''};
 
       final response = await http.post(
-        Uri.parse('$baseUrl/api/news-api/$newsId/$action/'),
+        Uri.parse('$baseUrl/news-api/$newsId/$action/'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Token $token',
@@ -274,7 +275,7 @@ class NewsService {
 
       // Utiliser l'endpoint dédié pour les news en attente
       final response = await http.get(
-        Uri.parse('$baseUrl/api/news-api/pending/'),
+        Uri.parse('$baseUrl/news-api/pending/'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Token $token',
