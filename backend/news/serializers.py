@@ -79,8 +79,11 @@ class NewsSerializer(serializers.ModelSerializer):
     """Sérialiseur pour les actualités"""
 
     author_name = serializers.CharField(source="author.get_full_name", read_only=True)
-    category_name = serializers.CharField(source="category.name", read_only=True)
-    category_color = serializers.CharField(source="category.color", read_only=True)
+    author = UserSerializer(read_only=True)
+    category = CategorySerializer(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(), source="category", write_only=True
+    )
     is_liked = serializers.SerializerMethodField()
     time_since = serializers.SerializerMethodField()
     # Exposer title/content en fonction du statut (final si publié/approuvé sinon draft)
@@ -101,8 +104,7 @@ class NewsSerializer(serializers.ModelSerializer):
             "author",
             "author_name",
             "category",
-            "category_name",
-            "category_color",
+            "category_id",
             "status",
             "importance",
             "written_at",

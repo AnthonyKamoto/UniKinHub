@@ -1,5 +1,5 @@
-import React from "react";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import React from 'react'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import {
   Container,
   Typography,
@@ -7,31 +7,32 @@ import {
   Button,
   AppBar,
   Toolbar,
-} from "@mui/material";
-import { Home as HomeIcon } from "@mui/icons-material";
-import { Link } from "react-router-dom";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import HomePage from "./pages/HomePage";
-import NewsDetailPage from "./pages/NewsDetailPage";
-import CreateNewsPage from "./pages/CreateNewsPage";
-import LandingPage from "./pages/LandingPage";
-import ModerationListPage from "./pages/ModerationListPage";
-import NotificationSettingsPage from "./pages/NotificationSettingsPage";
-import RegisterExtendedPage from "./pages/RegisterExtendedPage";
-import ProfileExtendedPage from "./pages/ProfileExtendedPage";
-import UserManagementPage from "./pages/UserManagementPage";
+} from '@mui/material'
+import { Home as HomeIcon } from '@mui/icons-material'
+import { Link } from 'react-router-dom'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
+import HomePage from './pages/HomePage'
+import NewsDetailPage from './pages/NewsDetailPage'
+import CreateNewsPage from './pages/CreateNewsPage'
+import LandingPage from './pages/LandingPage'
+import ModerationListPage from './pages/ModerationListPage'
+import NotificationSettingsPage from './pages/NotificationSettingsPage'
+import RegisterExtendedPage from './pages/RegisterExtendedPage'
+import ProfileExtendedPage from './pages/ProfileExtendedPage'
+import UserManagementPage from './pages/UserManagementPage'
+import AdminDashboard from './pages/AdminDashboard'
 // import ProfilePage from "./pages/ProfilePage" - Temporairement désactivé
-import "./App.css";
+import './App.css'
 
 // Composant pour gérer l'affichage de la page d'accueil
 const HomePageOrLanding = () => {
-  const { user } = useAuth();
-  return user ? <HomePage /> : <LandingPage />;
-};
+  const { user } = useAuth()
+  return user ? <HomePage /> : <LandingPage />
+}
 
 // Composant ProfilePage temporaire
 const ProfilePageTemp = () => {
-  const { user } = useAuth();
+  const { user } = useAuth()
 
   return (
     <Box sx={{ p: 3 }}>
@@ -43,7 +44,7 @@ const ProfilePageTemp = () => {
         sx={{
           mb: 3,
           p: 2,
-          backgroundColor: "background.paper",
+          backgroundColor: 'background.paper',
           borderRadius: 1,
         }}
       >
@@ -53,7 +54,7 @@ const ProfilePageTemp = () => {
         </Typography>
         <Typography>Email: {user?.email}</Typography>
         <Typography>
-          Statut: {user?.is_staff ? "Administrateur" : "Étudiant"}
+          Statut: {user?.is_staff ? 'Administrateur' : 'Étudiant'}
         </Typography>
       </Box>
 
@@ -61,7 +62,7 @@ const ProfilePageTemp = () => {
         sx={{
           mb: 3,
           p: 2,
-          backgroundColor: "background.paper",
+          backgroundColor: 'background.paper',
           borderRadius: 1,
         }}
       >
@@ -71,67 +72,17 @@ const ProfilePageTemp = () => {
         <Typography>Commentaires: 12</Typography>
       </Box>
     </Box>
-  );
-};
+  )
+}
 
-// Composant AdminDashboard simplifié
-const AdminDashboardSimple = () => {
-  const { user } = useAuth();
-
-  if (user?.role !== "admin") {
-    return (
-      <Box sx={{ p: 3, textAlign: "center" }}>
-        <Typography variant="h5" color="error">
-          Accès refusé
-        </Typography>
-        <Typography>
-          Vous devez être administrateur pour accéder à cette page.
-        </Typography>
-      </Box>
-    );
-  }
-
-  return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Tableau de bord administrateur
-      </Typography>
-
-      <Typography variant="body1" sx={{ mb: 3 }}>
-        Bienvenue {user.first_name} ! Voici votre interface d'administration.
-      </Typography>
-
-      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-        <Button variant="contained" size="large">
-          Gérer les actualités
-        </Button>
-        <Button variant="outlined" size="large">
-          Gérer les utilisateurs
-        </Button>
-        <Button variant="outlined" size="large">
-          Modérer les commentaires
-        </Button>
-      </Box>
-
-      <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>
-        Statistiques (Mock)
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        • Total actualités: 45
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        • En attente de modération: 8
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        • Utilisateurs inscrits: 234
-      </Typography>
-    </Box>
-  );
-};
+// Ancien composant AdminDashboard simplifié - remplacé par AdminDashboard dans pages/
+// const AdminDashboardSimple = () => {
+//   ...
+// };
 
 // Barre de navigation moderne et épurée
 const NavBar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuth()
 
   return (
     <AppBar position="sticky" elevation={0}>
@@ -142,26 +93,26 @@ const NavBar = () => {
           to="/"
           sx={{
             flexGrow: 1,
-            textDecoration: "none",
-            color: "inherit",
+            textDecoration: 'none',
+            color: 'inherit',
             fontWeight: 700,
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
             gap: 1.5,
-            fontSize: "1.3rem",
+            fontSize: '1.3rem',
           }}
         >
           <Box
             sx={{
               width: 36,
               height: 36,
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, #1976D2 0%, #42A5F5 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "white",
-              fontSize: "1.2rem",
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #1976D2 0%, #42A5F5 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '1.2rem',
             }}
           >
             📰
@@ -170,7 +121,7 @@ const NavBar = () => {
         </Typography>
 
         {user ? (
-          <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
             <Button
               color="inherit"
               component={Link}
@@ -179,10 +130,10 @@ const NavBar = () => {
                 borderRadius: 2,
                 px: 2,
                 py: 1,
-                textTransform: "none",
+                textTransform: 'none',
                 fontWeight: 500,
-                "&:hover": {
-                  backgroundColor: "rgba(25, 118, 210, 0.1)",
+                '&:hover': {
+                  backgroundColor: 'rgba(25, 118, 210, 0.1)',
                 },
               }}
             >
@@ -197,10 +148,10 @@ const NavBar = () => {
                 borderRadius: 2,
                 px: 2,
                 py: 1,
-                textTransform: "none",
+                textTransform: 'none',
                 fontWeight: 500,
-                "&:hover": {
-                  backgroundColor: "rgba(25, 118, 210, 0.1)",
+                '&:hover': {
+                  backgroundColor: 'rgba(25, 118, 210, 0.1)',
                 },
               }}
             >
@@ -215,17 +166,17 @@ const NavBar = () => {
                 borderRadius: 2,
                 px: 2,
                 py: 1,
-                textTransform: "none",
+                textTransform: 'none',
                 fontWeight: 500,
-                "&:hover": {
-                  backgroundColor: "rgba(25, 118, 210, 0.1)",
+                '&:hover': {
+                  backgroundColor: 'rgba(25, 118, 210, 0.1)',
                 },
               }}
             >
               🔔 Notifications
             </Button>
 
-            {["admin", "moderator"].includes(user.role) && (
+            {['admin', 'moderator'].includes(user.role) && (
               <Button
                 color="inherit"
                 component={Link}
@@ -234,10 +185,10 @@ const NavBar = () => {
                   borderRadius: 2,
                   px: 2,
                   py: 1,
-                  textTransform: "none",
+                  textTransform: 'none',
                   fontWeight: 500,
-                  "&:hover": {
-                    backgroundColor: "rgba(25, 118, 210, 0.1)",
+                  '&:hover': {
+                    backgroundColor: 'rgba(25, 118, 210, 0.1)',
                   },
                 }}
               >
@@ -245,7 +196,7 @@ const NavBar = () => {
               </Button>
             )}
 
-            {user.role === "admin" && (
+            {user.role === 'admin' && (
               <Button
                 color="inherit"
                 component={Link}
@@ -254,10 +205,10 @@ const NavBar = () => {
                   borderRadius: 2,
                   px: 2,
                   py: 1,
-                  textTransform: "none",
+                  textTransform: 'none',
                   fontWeight: 500,
-                  "&:hover": {
-                    backgroundColor: "rgba(25, 118, 210, 0.1)",
+                  '&:hover': {
+                    backgroundColor: 'rgba(25, 118, 210, 0.1)',
                   },
                 }}
               >
@@ -272,13 +223,13 @@ const NavBar = () => {
                 borderRadius: 2,
                 px: 2,
                 py: 1,
-                textTransform: "none",
+                textTransform: 'none',
                 fontWeight: 500,
                 ml: 1,
-                border: "1px solid rgba(25, 118, 210, 0.3)",
-                "&:hover": {
-                  backgroundColor: "rgba(25, 118, 210, 0.1)",
-                  borderColor: "rgba(25, 118, 210, 0.5)",
+                border: '1px solid rgba(25, 118, 210, 0.3)',
+                '&:hover': {
+                  backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                  borderColor: 'rgba(25, 118, 210, 0.5)',
                 },
               }}
             >
@@ -295,12 +246,12 @@ const NavBar = () => {
               borderRadius: 2,
               px: 3,
               py: 1.5,
-              textTransform: "none",
+              textTransform: 'none',
               fontWeight: 600,
-              borderColor: "rgba(25, 118, 210, 0.5)",
-              "&:hover": {
-                backgroundColor: "rgba(25, 118, 210, 0.1)",
-                borderColor: "rgba(25, 118, 210, 0.8)",
+              borderColor: 'rgba(25, 118, 210, 0.5)',
+              '&:hover': {
+                backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                borderColor: 'rgba(25, 118, 210, 0.8)',
               },
             }}
           >
@@ -309,41 +260,41 @@ const NavBar = () => {
         )}
       </Toolbar>
     </AppBar>
-  );
-};
+  )
+}
 
 // Page de connexion
 const LoginPage = () => {
-  const { login, isLoading, user } = useAuth();
-  const navigate = useNavigate();
+  const { login, isLoading, user } = useAuth()
+  const navigate = useNavigate()
   const [credentials, setCredentials] = React.useState({
-    email: "",
-    password: "",
-  });
-  const [error, setError] = React.useState("");
+    email: '',
+    password: '',
+  })
+  const [error, setError] = React.useState('')
 
   // Rediriger si déjà connecté
   React.useEffect(() => {
     if (user) {
-      navigate("/");
+      navigate('/')
     }
-  }, [user, navigate]);
+  }, [user, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+    e.preventDefault()
+    setError('')
 
     try {
-      const success = await login(credentials.email, credentials.password);
+      const success = await login(credentials.email, credentials.password)
       if (success) {
-        navigate("/");
+        navigate('/')
       } else {
-        setError("Identifiants incorrects");
+        setError('Identifiants incorrects')
       }
     } catch (err) {
-      setError("Identifiants incorrects");
+      setError('Identifiants incorrects')
     }
-  };
+  }
 
   return (
     <>
@@ -352,18 +303,18 @@ const LoginPage = () => {
         position="sticky"
         elevation={0}
         sx={{
-          bgcolor: "white",
-          borderBottom: "1px solid",
-          borderColor: "divider",
+          bgcolor: 'white',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
         }}
       >
         <Toolbar>
           <Button
             startIcon={<HomeIcon />}
-            onClick={() => navigate("/")}
+            onClick={() => navigate('/')}
             sx={{
-              color: "#1976D2",
-              textTransform: "none",
+              color: '#1976D2',
+              textTransform: 'none',
               fontWeight: 600,
             }}
           >
@@ -372,14 +323,14 @@ const LoginPage = () => {
           <Box sx={{ flexGrow: 1 }} />
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
+              display: 'flex',
+              alignItems: 'center',
               gap: 1,
             }}
           >
             <Box
               sx={{
-                fontSize: "1.5rem",
+                fontSize: '1.5rem',
                 fontWeight: 700,
               }}
             >
@@ -389,7 +340,7 @@ const LoginPage = () => {
               variant="h6"
               sx={{
                 fontWeight: 700,
-                color: "#1976D2",
+                color: '#1976D2',
               }}
             >
               UniKinHub
@@ -402,9 +353,9 @@ const LoginPage = () => {
         <Box
           sx={{
             mt: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
           }}
         >
           <Typography variant="h4" component="h1" gutterBottom>
@@ -414,7 +365,7 @@ const LoginPage = () => {
           <Box
             component="form"
             onSubmit={handleSubmit}
-            sx={{ mt: 3, width: "100%" }}
+            sx={{ mt: 3, width: '100%' }}
           >
             <Box sx={{ mb: 2 }}>
               <label htmlFor="username" className="login-label">
@@ -469,46 +420,46 @@ const LoginPage = () => {
               sx={{ mt: 3, mb: 2 }}
               disabled={isLoading}
             >
-              {isLoading ? "Connexion..." : "Se connecter"}
+              {isLoading ? 'Connexion...' : 'Se connecter'}
             </Button>
           </Box>
         </Box>
       </Container>
     </>
-  );
-};
+  )
+}
 
 // Composant de protection des routes
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
-  return user ? <>{children}</> : <Navigate to="/login" replace />;
-};
+  const { user } = useAuth()
+  return user ? <>{children}</> : <Navigate to="/login" replace />
+}
 
 // Composant pour routes admin uniquement
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
-  return user?.role === "admin" ? <>{children}</> : <Navigate to="/" replace />;
-};
+  const { user } = useAuth()
+  return user?.role === 'admin' ? <>{children}</> : <Navigate to="/" replace />
+}
 
 // Composant pour routes modérateurs et admin
 const ModeratorRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
-  return user && ["admin", "moderator"].includes(user.role) ? (
+  const { user } = useAuth()
+  return user && ['admin', 'moderator'].includes(user.role) ? (
     <>{children}</>
   ) : (
     <Navigate to="/" replace />
-  );
-};
+  )
+}
 
 // Composant App principal
 const AppContent = () => {
-  const { user } = useAuth();
+  const { user } = useAuth()
 
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        backgroundColor: user ? "#f5f5f5" : "transparent",
+        minHeight: '100vh',
+        backgroundColor: user ? '#f5f5f5' : 'transparent',
       }}
     >
       {user && <NavBar />}
@@ -556,7 +507,7 @@ const AppContent = () => {
               path="/admin"
               element={
                 <AdminRoute>
-                  <AdminDashboardSimple />
+                  <AdminDashboard />
                 </AdminRoute>
               }
             />
@@ -593,8 +544,8 @@ const AppContent = () => {
         </Routes>
       )}
     </Box>
-  );
-};
+  )
+}
 
 // Export principal avec AuthProvider
 export default function App() {
@@ -602,5 +553,5 @@ export default function App() {
     <AuthProvider>
       <AppContent />
     </AuthProvider>
-  );
+  )
 }

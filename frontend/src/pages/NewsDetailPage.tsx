@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -20,7 +20,7 @@ import {
   CircularProgress,
   Paper,
   Stack,
-} from "@mui/material";
+} from '@mui/material'
 import {
   Person,
   Visibility,
@@ -31,33 +31,33 @@ import {
   Send,
   ThumbUp,
   Share,
-} from "@mui/icons-material";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import toast from "react-hot-toast";
-import { newsAPI, commentAPI } from "../services/api";
-import { useAuth } from "../contexts/AuthContext";
-import type { News, Comment } from "../types";
+} from '@mui/icons-material'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import toast from 'react-hot-toast'
+import { newsAPI, commentAPI } from '../services/api'
+import { useAuth } from '../contexts/AuthContext'
+import type { News, Comment } from '../types'
 
 const commentSchema = z.object({
   content: z
     .string()
-    .min(1, "Le commentaire ne peut pas être vide")
-    .max(500, "Maximum 500 caractères"),
-});
+    .min(1, 'Le commentaire ne peut pas être vide')
+    .max(500, 'Maximum 500 caractères'),
+})
 
-type CommentFormData = z.infer<typeof commentSchema>;
+type CommentFormData = z.infer<typeof commentSchema>
 
 const NewsDetailPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const [showCommentForm, setShowCommentForm] = useState(false);
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
+  const [showCommentForm, setShowCommentForm] = useState(false)
 
   const {
     register,
@@ -66,7 +66,7 @@ const NewsDetailPage = () => {
     reset,
   } = useForm<CommentFormData>({
     resolver: zodResolver(commentSchema),
-  });
+  })
 
   // Requête pour récupérer l'article
   const {
@@ -74,79 +74,114 @@ const NewsDetailPage = () => {
     isLoading: articleLoading,
     error: articleError,
   } = useQuery({
-    queryKey: ["news", id],
+    queryKey: ['news', id],
     queryFn: () => newsAPI.getNewsById(Number(id)),
     enabled: !!id,
-  });
+  })
 
   // Requête pour récupérer les commentaires
   const { data: comments, isLoading: commentsLoading } = useQuery({
-    queryKey: ["comments", id],
+    queryKey: ['comments', id],
     queryFn: () => commentAPI.getComments(Number(id)),
     enabled: !!id,
-  });
+  })
 
   // Mutation pour ajouter un commentaire
   const addCommentMutation = useMutation({
     mutationFn: (content: string) =>
       commentAPI.createComment(Number(id), content),
     onSuccess: () => {
-      toast.success("Commentaire ajouté avec succès");
-      queryClient.invalidateQueries({ queryKey: ["comments", id] });
-      reset();
-      setShowCommentForm(false);
+      toast.success('Commentaire ajouté avec succès')
+      queryClient.invalidateQueries({ queryKey: ['comments', id] })
+      reset()
+      setShowCommentForm(false)
     },
     onError: () => {
-      toast.error("Erreur lors de l'ajout du commentaire");
+      toast.error("Erreur lors de l'ajout du commentaire")
     },
-  });
+  })
 
   // Mutation pour supprimer un commentaire
   const deleteCommentMutation = useMutation({
     mutationFn: (commentId: number) => commentAPI.deleteComment(commentId),
     onSuccess: () => {
-      toast.success("Commentaire supprimé");
-      queryClient.invalidateQueries({ queryKey: ["comments", id] });
+      toast.success('Commentaire supprimé')
+      queryClient.invalidateQueries({ queryKey: ['comments', id] })
     },
     onError: () => {
-      toast.error("Erreur lors de la suppression");
+      toast.error('Erreur lors de la suppression')
     },
-  });
+  })
+
+  // Mutation pour supprimer l'actualité (admin uniquement)
+  const deleteNewsMutation = useMutation({
+    mutationFn: () => newsAPI.deleteNews(Number(id)),
+    onSuccess: () => {
+      toast.success('Actualité supprimée avec succès')
+      navigate('/news')
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.response?.data?.error ||
+          "Erreur lors de la suppression de l'actualité"
+      )
+    },
+  })
 
   const onSubmitComment = (data: CommentFormData) => {
-    addCommentMutation.mutate(data.content);
-  };
+    addCommentMutation.mutate(data.content)
+  }
 
   const handleDeleteComment = (commentId: number) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer ce commentaire ?")) {
-      deleteCommentMutation.mutate(commentId);
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) {
+      deleteCommentMutation.mutate(commentId)
     }
-  };
+  }
+
+  const handleDeleteNews = () => {
+    if (
+      window.confirm(
+        '⚠️ ATTENTION : Êtes-vous sûr de vouloir supprimer définitivement cette actualité ? Cette action est irréversible.'
+      )
+    ) {
+      deleteNewsMutation.mutate()
+    }
+  }
 
   const canEditArticle = () => {
-    if (!user || !article) return false;
-    return user.role === "admin" || user.id === article.author.id;
-  };
+    if (!user || !article) return false
+    return user.role === 'admin' || user.id === article.author.id
+  }
+
+  const canDeleteArticle = () => {
+    if (!user || !article) return false
+    // Les publiants et administrateurs peuvent supprimer
+    return (
+      user.role === 'admin' ||
+      user.role === 'publisher' ||
+      user.role === 'enseignant'
+    )
+  }
 
   const canDeleteComment = (comment: Comment) => {
-    if (!user) return false;
-    return user.role === "admin" || user.id === comment.user.id;
-  };
+    if (!user) return false
+    return user.role === 'admin' || user.id === comment.user.id
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "published":
-        return "success";
-      case "pending":
-        return "warning";
-      case "draft":
-        return "info";
-      case "rejected":
-        return "error";
+      case 'published':
+        return 'success'
+      case 'pending':
+        return 'warning'
+      case 'draft':
+        return 'info'
+      case 'rejected':
+        return 'error'
       default:
-        return "default";
+        return 'default'
     }
-  };
+  }
 
   const handleShare = async () => {
     if (navigator.share && article) {
@@ -155,31 +190,31 @@ const NewsDetailPage = () => {
           title: article.title,
           text: article.summary,
           url: window.location.href,
-        });
+        })
       } catch (error) {
         // Fallback: copier dans le presse-papiers
-        navigator.clipboard.writeText(window.location.href);
-        toast.success("Lien copié dans le presse-papiers");
+        navigator.clipboard.writeText(window.location.href)
+        toast.success('Lien copié dans le presse-papiers')
       }
     } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success("Lien copié dans le presse-papiers");
+      navigator.clipboard.writeText(window.location.href)
+      toast.success('Lien copié dans le presse-papiers')
     }
-  };
+  }
 
   if (articleLoading) {
     return (
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
           minHeight: 400,
         }}
       >
         <CircularProgress />
       </Box>
-    );
+    )
   }
 
   if (articleError || !article) {
@@ -190,21 +225,21 @@ const NewsDetailPage = () => {
         </Alert>
         <Button
           startIcon={<ArrowBack />}
-          onClick={() => navigate("/")}
+          onClick={() => navigate('/')}
           sx={{ mt: 2 }}
         >
           Retour à l'accueil
         </Button>
       </Box>
-    );
+    )
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: 800, mx: "auto" }}>
+    <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
       {/* Bouton retour */}
       <Button
         startIcon={<ArrowBack />}
-        onClick={() => navigate("/")}
+        onClick={() => navigate('/')}
         sx={{ mb: 3 }}
       >
         Retour à l'accueil
@@ -249,16 +284,16 @@ const NewsDetailPage = () => {
 
             <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
+                display: 'flex',
+                alignItems: 'center',
                 gap: 2,
                 mb: 2,
               }}
             >
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 1,
                 }}
               >
@@ -277,8 +312,8 @@ const NewsDetailPage = () => {
 
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 0.5,
                 }}
               >
@@ -290,21 +325,21 @@ const NewsDetailPage = () => {
             </Box>
 
             <Typography variant="caption" color="text.secondary">
-              Publié le{" "}
-              {format(new Date(article.created_at), "dd MMMM yyyy à HH:mm", {
+              Publié le{' '}
+              {format(new Date(article.created_at), 'dd MMMM yyyy à HH:mm', {
                 locale: fr,
               })}
               {article.updated_at !== article.created_at &&
                 ` • Modifié le ${format(
                   new Date(article.updated_at),
-                  "dd MMMM yyyy à HH:mm",
-                  { locale: fr },
+                  'dd MMMM yyyy à HH:mm',
+                  { locale: fr }
                 )}`}
             </Typography>
           </Box>
 
           {/* Actions */}
-          <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
+          <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
             <Button
               startIcon={<Share />}
               onClick={handleShare}
@@ -315,24 +350,27 @@ const NewsDetailPage = () => {
             </Button>
 
             {canEditArticle() && (
-              <>
-                <Button
-                  startIcon={<Edit />}
-                  onClick={() => navigate(`/edit/${article.id}`)}
-                  variant="outlined"
-                  size="small"
-                >
-                  Modifier
-                </Button>
-                <Button
-                  startIcon={<Delete />}
-                  color="error"
-                  variant="outlined"
-                  size="small"
-                >
-                  Supprimer
-                </Button>
-              </>
+              <Button
+                startIcon={<Edit />}
+                onClick={() => navigate(`/edit/${article.id}`)}
+                variant="outlined"
+                size="small"
+              >
+                Modifier
+              </Button>
+            )}
+
+            {canDeleteArticle() && (
+              <Button
+                startIcon={<Delete />}
+                color="error"
+                variant="outlined"
+                size="small"
+                onClick={handleDeleteNews}
+                disabled={deleteNewsMutation.isPending}
+              >
+                {deleteNewsMutation.isPending ? 'Suppression...' : 'Supprimer'}
+              </Button>
             )}
           </Box>
 
@@ -345,7 +383,7 @@ const NewsDetailPage = () => {
           <Typography
             variant="body1"
             paragraph
-            sx={{ fontStyle: "italic", mb: 3 }}
+            sx={{ fontStyle: 'italic', mb: 3 }}
           >
             {article.summary}
           </Typography>
@@ -356,13 +394,13 @@ const NewsDetailPage = () => {
           </Typography>
           <Typography
             variant="body1"
-            sx={{ whiteSpace: "pre-wrap", lineHeight: 1.7 }}
+            sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.7 }}
           >
             {article.content}
           </Typography>
 
           {/* Raison de modération si rejeté */}
-          {article.status === "rejected" && article.moderation_reason && (
+          {article.status === 'rejected' && article.moderation_reason && (
             <Alert severity="warning" sx={{ mt: 3 }}>
               <Typography variant="subtitle2">Raison du rejet :</Typography>
               {article.moderation_reason}
@@ -389,31 +427,31 @@ const NewsDetailPage = () => {
                 Ajouter un commentaire
               </Button>
             ) : (
-              <Paper sx={{ p: 2, bgcolor: "grey.50" }}>
+              <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
                 <form onSubmit={handleSubmit(onSubmitComment)}>
                   <TextField
                     fullWidth
                     multiline
                     rows={3}
                     placeholder="Écrivez votre commentaire..."
-                    {...register("content")}
+                    {...register('content')}
                     error={!!errors.content}
                     helperText={errors.content?.message}
                     sx={{ mb: 2 }}
                   />
-                  <Box sx={{ display: "flex", gap: 1 }}>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
                     <Button
                       type="submit"
                       variant="contained"
                       startIcon={<Send />}
                       disabled={addCommentMutation.isPending}
                     >
-                      {addCommentMutation.isPending ? "Envoi..." : "Publier"}
+                      {addCommentMutation.isPending ? 'Envoi...' : 'Publier'}
                     </Button>
                     <Button
                       onClick={() => {
-                        setShowCommentForm(false);
-                        reset();
+                        setShowCommentForm(false)
+                        reset()
                       }}
                     >
                       Annuler
@@ -444,8 +482,8 @@ const NewsDetailPage = () => {
                     primary={
                       <Box
                         sx={{
-                          display: "flex",
-                          alignItems: "center",
+                          display: 'flex',
+                          alignItems: 'center',
                           gap: 1,
                         }}
                       >
@@ -455,8 +493,8 @@ const NewsDetailPage = () => {
                         <Typography variant="caption" color="text.secondary">
                           {format(
                             new Date(comment.created_at),
-                            "dd MMMM yyyy à HH:mm",
-                            { locale: fr },
+                            'dd MMMM yyyy à HH:mm',
+                            { locale: fr }
                           )}
                         </Typography>
                         {!comment.is_approved && (
@@ -497,7 +535,7 @@ const NewsDetailPage = () => {
         )}
       </Paper>
     </Box>
-  );
-};
+  )
+}
 
-export default NewsDetailPage;
+export default NewsDetailPage

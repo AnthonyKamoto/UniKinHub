@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/news_provider.dart';
+import '../providers/auth_provider.dart';
 import '../models/news.dart';
 
 class NewsDetailScreen extends StatefulWidget {
@@ -46,6 +47,12 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final canDelete =
+        authProvider.currentUser?.role == 'admin' ||
+        authProvider.currentUser?.role == 'teacher' ||
+        authProvider.currentUser?.role == 'publisher';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Détail de l\'actualité'),
@@ -59,6 +66,11 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
                 color: _news!.isLiked ? Colors.red : Colors.white,
               ),
               onPressed: () => _toggleLike(),
+            ),
+          if (_news != null && canDelete)
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.white),
+              onPressed: () => _confirmDelete(),
             ),
         ],
       ),
@@ -377,6 +389,64 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
               : _news!.likesCount + 1,
         });
       });
+    }
+  }
+
+  Future<void> _confirmDelete() async {
+    if (_news == null) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Supprimer l\'actualité'),
+        content: Text(
+          'Êtes-vous sûr de vouloir supprimer "${_news!.title}" ?\n\nCette action est irréversible.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Supprimer'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await _deleteNews();
+    }
+  }
+
+  Future<void> _deleteNews() async {
+    if (_news == null) return;
+
+    final newsProvider = Provider.of<NewsProvider>(context, listen: false);
+    final success = await newsProvider.deleteNews(_news!.id);
+
+    if (mounted) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Actualité supprimée avec succès'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        // Retourner à l'écran précédent après suppression
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Erreur lors de la suppression'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 

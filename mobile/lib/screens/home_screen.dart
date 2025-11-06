@@ -328,6 +328,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildNewsCard(News news) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final canDelete =
+        authProvider.currentUser?.role == 'admin' ||
+        authProvider.currentUser?.role == 'teacher' ||
+        authProvider.currentUser?.role == 'publisher';
+
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
@@ -449,6 +455,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         onPressed: () => _toggleLike(news.id),
                       ),
+                      if (canDelete)
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _confirmDelete(news),
+                        ),
                     ],
                   ),
                 ],
@@ -548,6 +559,52 @@ class _HomeScreenState extends State<HomeScreen> {
   void _toggleLike(int newsId) {
     HapticFeedback.mediumImpact();
     Provider.of<NewsProvider>(context, listen: false).toggleLike(newsId);
+  }
+
+  Future<void> _confirmDelete(News news) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Supprimer l\'actualité'),
+        content: Text(
+          'Êtes-vous sûr de vouloir supprimer "${news.title}" ?\n\nCette action est irréversible.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Supprimer'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await _deleteNews(news.id);
+    }
+  }
+
+  Future<void> _deleteNews(int newsId) async {
+    final newsProvider = Provider.of<NewsProvider>(context, listen: false);
+    final success = await newsProvider.deleteNews(newsId);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            success
+                ? 'Actualité supprimée avec succès'
+                : 'Erreur lors de la suppression',
+          ),
+          backgroundColor: success ? Colors.green : Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _showFilterDialog() async {

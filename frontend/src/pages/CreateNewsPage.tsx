@@ -126,8 +126,7 @@ const CreateNewsPage = () => {
     setActiveStep((prevStep) => prevStep - 1)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (isDraft = false) => {
     setLoading(true)
 
     try {
@@ -154,7 +153,11 @@ const CreateNewsPage = () => {
       // Créer l'actualité via l'API ViewSet
       await newsAPI.createNews(formDataToSend)
 
-      alert('Actualité créée avec succès !')
+      alert(
+        isDraft
+          ? 'Brouillon sauvegardé avec succès !'
+          : 'Actualité créée avec succès !'
+      )
 
       // Reset form
       setFormData({
@@ -659,7 +662,7 @@ const CreateNewsPage = () => {
 
         {loading && <LinearProgress sx={{ mb: 3 }} />}
 
-        <Box component="form" onSubmit={handleSubmit}>
+        <Box component="div">
           {renderStepContent(activeStep)}
 
           <Box
@@ -672,6 +675,7 @@ const CreateNewsPage = () => {
             }}
           >
             <Button
+              type="button"
               disabled={activeStep === 0}
               onClick={handleBack}
               startIcon={<CancelIcon />}
@@ -683,31 +687,28 @@ const CreateNewsPage = () => {
               {activeStep === steps.length - 1 ? (
                 <>
                   <Button
-                    type="submit"
+                    type="button"
                     variant="outlined"
                     disabled={loading}
                     startIcon={<SaveIcon />}
-                    onClick={() =>
-                      setFormData({
-                        ...formData,
-                        draft: true,
-                      })
-                    }
+                    onClick={() => handleSubmit(true)}
                   >
                     Sauvegarder brouillon
                   </Button>
                   <Button
-                    type="submit"
+                    type="button"
                     variant="contained"
                     disabled={loading}
                     startIcon={<SendIcon />}
                     sx={{ minWidth: 150 }}
+                    onClick={() => handleSubmit(false)}
                   >
                     {loading ? 'Publication...' : 'Publier'}
                   </Button>
                 </>
               ) : (
                 <Button
+                  type="button"
                   variant="contained"
                   onClick={handleNext}
                   endIcon={<CheckIcon />}

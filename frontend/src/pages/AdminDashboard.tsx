@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 import {
   Box,
   Typography,
@@ -35,7 +35,7 @@ import {
   SpeedDial,
   SpeedDialAction,
   SpeedDialIcon,
-} from "@mui/material";
+} from '@mui/material'
 import {
   Dashboard as DashboardIcon,
   People as PeopleIcon,
@@ -58,17 +58,18 @@ import {
   PersonAdd as PersonAddIcon,
   Mail as MailIcon,
   CloudUpload as UploadIcon,
-} from "@mui/icons-material";
-import { useAuth } from "../contexts/AuthContext";
+} from '@mui/icons-material'
+import { useAuth } from '../contexts/AuthContext'
+import { adminAPI } from '../services/api'
 
 interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
+  children?: React.ReactNode
+  index: number
+  value: number
 }
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+  const { children, value, index, ...other } = props
 
   return (
     <div
@@ -80,139 +81,126 @@ function TabPanel(props: TabPanelProps) {
     >
       {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
     </div>
-  );
+  )
 }
 
-const AdminDashboard = () => {
-  const { user } = useAuth();
-  const [currentTab, setCurrentTab] = React.useState(0);
-  const [loading, setLoading] = React.useState(false);
+export default function AdminDashboard() {
+  const { user } = useAuth()
+  const [activeTab, setActiveTab] = React.useState(0)
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
 
-  // Données de démonstration (à remplacer par API)
-  const [dashboardStats] = React.useState({
-    total_users: 234,
-    total_news: 89,
-    pending_news: 12,
-    active_users_today: 45,
-    news_views_today: 287,
-    user_growth: 15.3, // %
-    news_growth: 8.7, // %
-  });
+  // Fetch real dashboard stats from API
+  const [dashboardStats, setDashboardStats] = React.useState<{
+    total_news: number
+    recent_news: number
+    unread_notifications: number
+    popular_categories: any[]
+    user_role: string
+    user_university: string
+  }>({
+    total_news: 0,
+    recent_news: 0,
+    unread_notifications: 0,
+    popular_categories: [],
+    user_role: '',
+    user_university: '',
+  })
 
-  const [recentActivity] = React.useState([
-    {
-      id: 1,
-      type: "news_created",
-      user: "Marie Dupont",
-      action: "a créé une nouvelle actualité",
-      title: "Ouverture de la nouvelle bibliothèque",
-      time: "Il y a 2 heures",
-      status: "pending",
-    },
-    {
-      id: 2,
-      type: "user_registered",
-      user: "Jean Martin",
-      action: "s'est inscrit",
-      time: "Il y a 3 heures",
-      status: "active",
-    },
-    {
-      id: 3,
-      type: "news_approved",
-      user: "Admin",
-      action: "a approuvé l'actualité",
-      title: "Conférence sur l'IA",
-      time: "Il y a 5 heures",
-      status: "approved",
-    },
-  ]);
+  React.useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const stats = await adminAPI.getStats()
+        setDashboardStats(stats)
+      } catch (err) {
+        console.error('Erreur lors du chargement des statistiques:', err)
+        setError('Impossible de charger les statistiques du tableau de bord')
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  const [pendingNews] = React.useState([
-    {
-      id: 1,
-      title: "Nouvelle procédure d'inscription",
-      author: "Sophie Bernard",
-      created_at: "2025-10-22T10:30:00Z",
-      importance: "high",
-      category: "Administrative",
-    },
-    {
-      id: 2,
-      title: "Événement portes ouvertes",
-      author: "Pierre Moreau",
-      created_at: "2025-10-22T09:15:00Z",
-      importance: "medium",
-      category: "Événements",
-    },
-  ]);
+    fetchStats()
+  }, [])
 
-  const [systemUsers] = React.useState([
-    {
-      id: 1,
-      name: "Marie Dupont",
-      email: "marie.dupont@email.com",
-      role: "student",
-      university: "UNIKIN",
-      last_active: "2025-10-22T08:30:00Z",
-      status: "active",
-      news_count: 5,
-    },
-    {
-      id: 2,
-      name: "Jean Martin",
-      email: "jean.martin@email.com",
-      role: "moderator",
-      university: "UPN",
-      last_active: "2025-10-21T16:45:00Z",
-      status: "active",
-      news_count: 12,
-    },
-  ]);
+  const [recentActivity, setRecentActivity] = React.useState<any[]>([])
+  const [pendingNews, setPendingNews] = React.useState<any[]>([])
+  const [systemUsers, setSystemUsers] = React.useState<any[]>([])
+
+  // Charger les actualités en attente
+  React.useEffect(() => {
+    const fetchPendingNews = async () => {
+      try {
+        const news = await adminAPI.getPendingNews()
+        setPendingNews(news)
+      } catch (err) {
+        console.error(
+          'Erreur lors du chargement des actualités en attente:',
+          err
+        )
+      }
+    }
+    fetchPendingNews()
+  }, [])
+
+  // Charger les utilisateurs
+  React.useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const users = await adminAPI.getUsers()
+        setSystemUsers(users)
+      } catch (err) {
+        console.error('Erreur lors du chargement des utilisateurs:', err)
+      }
+    }
+    fetchUsers()
+  }, [])
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setCurrentTab(newValue);
-  };
+    setActiveTab(newValue)
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending":
-        return "warning";
-      case "approved":
-        return "success";
-      case "rejected":
-        return "error";
-      case "active":
-        return "success";
+      case 'pending':
+        return 'warning'
+      case 'approved':
+        return 'success'
+      case 'rejected':
+        return 'error'
+      case 'active':
+        return 'success'
       default:
-        return "default";
+        return 'default'
     }
-  };
+  }
 
   const getImportanceColor = (importance: string) => {
     switch (importance) {
-      case "high":
-        return "#f44336";
-      case "medium":
-        return "#ff9800";
-      case "low":
-        return "#4caf50";
+      case 'high':
+        return '#f44336'
+      case 'medium':
+        return '#ff9800'
+      case 'low':
+        return '#4caf50'
       default:
-        return "#9e9e9e";
+        return '#9e9e9e'
     }
-  };
+  }
 
   const speedDialActions = [
-    { icon: <PersonAddIcon />, name: "Ajouter utilisateur" },
-    { icon: <ArticleIcon />, name: "Créer actualité" },
-    { icon: <MailIcon />, name: "Envoyer notification" },
-    { icon: <UploadIcon />, name: "Import données" },
-  ];
+    { icon: <PersonAddIcon />, name: 'Ajouter utilisateur' },
+    { icon: <ArticleIcon />, name: 'Créer actualité' },
+    { icon: <MailIcon />, name: 'Envoyer notification' },
+    { icon: <UploadIcon />, name: 'Import données' },
+  ]
 
-  if (user?.role !== "admin") {
+  if (user?.role !== 'admin') {
     return (
-      <Box sx={{ p: 3, textAlign: "center" }}>
-        <Alert severity="error" sx={{ maxWidth: 500, mx: "auto" }}>
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Alert severity="error" sx={{ maxWidth: 500, mx: 'auto' }}>
           <Typography variant="h6" gutterBottom>
             Accès refusé
           </Typography>
@@ -222,29 +210,48 @@ const AdminDashboard = () => {
           </Typography>
         </Alert>
       </Box>
-    );
+    )
+  }
+
+  if (loading) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <LinearProgress />
+        <Typography sx={{ mt: 2, textAlign: 'center' }}>
+          Chargement des statistiques...
+        </Typography>
+      </Box>
+    )
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    )
   }
 
   return (
-    <Box sx={{ p: 3, backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
+    <Box sx={{ p: 3, backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       {/* En-tête */}
       <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 3 }}>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
           <Box>
             <Typography
               variant="h4"
               sx={{
-                background: "linear-gradient(45deg, #FF6B35 30%, #F7931E 90%)",
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                fontWeight: "bold",
+                background: 'linear-gradient(45deg, #FF6B35 30%, #F7931E 90%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontWeight: 'bold',
               }}
             >
               🔧 Tableau de bord Admin
@@ -258,9 +265,9 @@ const AdminDashboard = () => {
               color="primary"
               onClick={() => window.location.reload()}
               sx={{
-                bgcolor: "primary.main",
-                color: "white",
-                "&:hover": { bgcolor: "primary.dark" },
+                bgcolor: 'primary.main',
+                color: 'white',
+                '&:hover': { bgcolor: 'primary.dark' },
               }}
             >
               <RefreshIcon />
@@ -275,53 +282,16 @@ const AdminDashboard = () => {
           <Card
             sx={{
               borderRadius: 3,
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              color: "white",
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
             }}
           >
             <CardContent>
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Box>
-                  <Typography variant="h4" fontWeight="bold">
-                    {dashboardStats.total_users}
-                  </Typography>
-                  <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                    Utilisateurs total
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ display: "flex", alignItems: "center", mt: 1 }}
-                  >
-                    <TrendingIcon sx={{ fontSize: 16, mr: 0.5 }} />+
-                    {dashboardStats.user_growth}% ce mois
-                  </Typography>
-                </Box>
-                <PeopleIcon sx={{ fontSize: 48, opacity: 0.8 }} />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card
-            sx={{
-              borderRadius: 3,
-              background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-              color: "white",
-            }}
-          >
-            <CardContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
                 }}
               >
                 <Box>
@@ -333,10 +303,10 @@ const AdminDashboard = () => {
                   </Typography>
                   <Typography
                     variant="caption"
-                    sx={{ display: "flex", alignItems: "center", mt: 1 }}
+                    sx={{ display: 'flex', alignItems: 'center', mt: 1 }}
                   >
-                    <TrendingIcon sx={{ fontSize: 16, mr: 0.5 }} />+
-                    {dashboardStats.news_growth}% ce mois
+                    <TrendingIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                    {dashboardStats.recent_news} cette semaine
                   </Typography>
                 </Box>
                 <ArticleIcon sx={{ fontSize: 48, opacity: 0.8 }} />
@@ -349,34 +319,71 @@ const AdminDashboard = () => {
           <Card
             sx={{
               borderRadius: 3,
-              background: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-              color: "white",
+              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+              color: 'white',
             }}
           >
             <CardContent>
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
                 }}
               >
                 <Box>
                   <Typography variant="h4" fontWeight="bold">
-                    {dashboardStats.pending_news}
+                    {dashboardStats.recent_news}
                   </Typography>
                   <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                    En attente
+                    Actualités récentes
                   </Typography>
                   <Typography
                     variant="caption"
-                    sx={{ mt: 1, display: "block" }}
+                    sx={{ display: 'flex', alignItems: 'center', mt: 1 }}
                   >
-                    Nécessite votre attention
+                    <TrendingIcon sx={{ fontSize: 16, mr: 0.5 }} />7 derniers
+                    jours
+                  </Typography>
+                </Box>
+                <ArticleIcon sx={{ fontSize: 48, opacity: 0.8 }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Card
+            sx={{
+              borderRadius: 3,
+              background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+              color: 'white',
+            }}
+          >
+            <CardContent>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Box>
+                  <Typography variant="h4" fontWeight="bold">
+                    {dashboardStats.unread_notifications}
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                    Notifications
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{ mt: 1, display: 'block' }}
+                  >
+                    Non lues
                   </Typography>
                 </Box>
                 <Badge
-                  badgeContent={dashboardStats.pending_news}
+                  badgeContent={dashboardStats.unread_notifications}
                   color="warning"
                 >
                   <NotificationsIcon sx={{ fontSize: 48, opacity: 0.8 }} />
@@ -390,33 +397,33 @@ const AdminDashboard = () => {
           <Card
             sx={{
               borderRadius: 3,
-              background: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-              color: "white",
+              background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+              color: 'white',
             }}
           >
             <CardContent>
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
                 }}
               >
                 <Box>
                   <Typography variant="h4" fontWeight="bold">
-                    {dashboardStats.news_views_today}
+                    {dashboardStats.popular_categories.length}
                   </Typography>
                   <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                    Vues aujourd'hui
+                    Catégories actives
                   </Typography>
                   <Typography
                     variant="caption"
-                    sx={{ mt: 1, display: "block" }}
+                    sx={{ mt: 1, display: 'block' }}
                   >
-                    {dashboardStats.active_users_today} utilisateurs actifs
+                    Avec publications
                   </Typography>
                 </Box>
-                <ViewIcon sx={{ fontSize: 48, opacity: 0.8 }} />
+                <AnalyticsIcon sx={{ fontSize: 48, opacity: 0.8 }} />
               </Box>
             </CardContent>
           </Card>
@@ -425,8 +432,8 @@ const AdminDashboard = () => {
 
       {/* Onglets de gestion */}
       <Paper elevation={2} sx={{ borderRadius: 3 }}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs value={currentTab} onChange={handleTabChange} sx={{ px: 2 }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={activeTab} onChange={handleTabChange} sx={{ px: 2 }}>
             <Tab
               icon={<DashboardIcon />}
               label="Vue d'ensemble"
@@ -456,67 +463,80 @@ const AdminDashboard = () => {
         </Box>
 
         {/* Onglet Vue d'ensemble */}
-        <TabPanel value={currentTab} index={0}>
+        <TabPanel value={activeTab} index={0}>
           <Grid container spacing={3}>
             {/* Activité récente */}
             <Grid item xs={12} md={8}>
               <Typography
                 variant="h6"
                 gutterBottom
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
               >
                 <SpeedIcon color="primary" />
                 Activité récente
               </Typography>
-              <List>
-                {recentActivity.map((activity) => (
-                  <ListItem
-                    key={activity.id}
-                    sx={{ bgcolor: "background.paper", mb: 1, borderRadius: 2 }}
-                  >
-                    <ListItemAvatar>
-                      <Avatar
-                        sx={{
-                          bgcolor:
-                            getStatusColor(activity.status) === "success"
-                              ? "success.main"
-                              : "warning.main",
-                        }}
-                      >
-                        {activity.type === "news_created" ? (
-                          <ArticleIcon />
-                        ) : activity.type === "user_registered" ? (
-                          <PeopleIcon />
-                        ) : (
-                          <ApproveIcon />
-                        )}
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={`${activity.user} ${activity.action}`}
-                      secondary={
-                        <Box>
-                          {activity.title && (
-                            <Typography variant="body2" color="primary">
-                              {activity.title}
-                            </Typography>
+              {recentActivity.length === 0 ? (
+                <Alert severity="info">
+                  Aucune activité récente à afficher
+                </Alert>
+              ) : (
+                <List>
+                  {recentActivity.map((activity) => (
+                    <ListItem
+                      key={activity.id}
+                      sx={{
+                        bgcolor: 'background.paper',
+                        mb: 1,
+                        borderRadius: 2,
+                      }}
+                    >
+                      <ListItemAvatar>
+                        <Avatar
+                          sx={{
+                            bgcolor:
+                              getStatusColor(activity.status) === 'success'
+                                ? 'success.main'
+                                : 'warning.main',
+                          }}
+                        >
+                          {activity.type === 'news_created' ? (
+                            <ArticleIcon />
+                          ) : activity.type === 'user_registered' ? (
+                            <PeopleIcon />
+                          ) : (
+                            <ApproveIcon />
                           )}
-                          <Typography variant="caption" color="text.secondary">
-                            {activity.time}
-                          </Typography>
-                        </Box>
-                      }
-                    />
-                    <ListItemSecondaryAction>
-                      <Chip
-                        size="small"
-                        label={activity.status}
-                        color={getStatusColor(activity.status) as any}
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={`${activity.user} ${activity.action}`}
+                        secondary={
+                          <Box>
+                            {activity.title && (
+                              <Typography variant="body2" color="primary">
+                                {activity.title}
+                              </Typography>
+                            )}
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              {activity.time}
+                            </Typography>
+                          </Box>
+                        }
                       />
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
+                      <ListItemSecondaryAction>
+                        <Chip
+                          size="small"
+                          label={activity.status}
+                          color={getStatusColor(activity.status) as any}
+                        />
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  ))}
+                </List>
+              )}
             </Grid>
 
             {/* Actions rapides */}
@@ -571,12 +591,12 @@ const AdminDashboard = () => {
         </TabPanel>
 
         {/* Onglet Actualités */}
-        <TabPanel value={currentTab} index={1}>
+        <TabPanel value={activeTab} index={1}>
           <Box
             sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               mb: 3,
             }}
           >
@@ -594,97 +614,109 @@ const AdminDashboard = () => {
             </Alert>
           )}
 
-          <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
-            <Table>
-              <TableHead>
-                <TableRow sx={{ bgcolor: "grey.50" }}>
-                  <TableCell>
-                    <strong>Titre</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Auteur</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Catégorie</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Importance</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Date</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Actions</strong>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {pendingNews.map((news) => (
-                  <TableRow key={news.id} hover>
+          {pendingNews.length === 0 ? (
+            <Alert severity="info">
+              Aucune actualité en attente de modération
+            </Alert>
+          ) : (
+            <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ bgcolor: 'grey.50' }}>
                     <TableCell>
-                      <Typography variant="body2" fontWeight={500}>
-                        {news.title}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{news.author}</TableCell>
-                    <TableCell>
-                      <Chip
-                        size="small"
-                        label={news.category}
-                        variant="outlined"
-                      />
+                      <strong>Titre</strong>
                     </TableCell>
                     <TableCell>
-                      <Chip
-                        size="small"
-                        label={news.importance}
-                        sx={{
-                          backgroundColor: getImportanceColor(news.importance),
-                          color: "white",
-                        }}
-                      />
+                      <strong>Auteur</strong>
                     </TableCell>
                     <TableCell>
-                      {new Date(news.created_at).toLocaleDateString("fr-FR")}
+                      <strong>Catégorie</strong>
                     </TableCell>
                     <TableCell>
-                      <Box sx={{ display: "flex", gap: 1 }}>
-                        <Tooltip title="Approuver">
-                          <IconButton size="small" color="success">
-                            <ApproveIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Modifier">
-                          <IconButton size="small" color="primary">
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Rejeter">
-                          <IconButton size="small" color="error">
-                            <BlockIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
+                      <strong>Importance</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Date</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Actions</strong>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {pendingNews.map((news) => (
+                    <TableRow key={news.id} hover>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight={500}>
+                          {news.title}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        {news.author?.first_name} {news.author?.last_name}
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          size="small"
+                          label={news.category?.name || 'Non catégorisé'}
+                          variant="outlined"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          size="small"
+                          label={news.importance || 'normal'}
+                          sx={{
+                            backgroundColor: getImportanceColor(
+                              news.importance || 'normal'
+                            ),
+                            color: 'white',
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {new Date(
+                          news.written_at || news.created_at
+                        ).toLocaleDateString('fr-FR')}
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Tooltip title="Approuver">
+                            <IconButton size="small" color="success">
+                              <ApproveIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Modifier">
+                            <IconButton size="small" color="primary">
+                              <EditIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Rejeter">
+                            <IconButton size="small" color="error">
+                              <BlockIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </TabPanel>
 
         {/* Onglet Utilisateurs */}
-        <TabPanel value={currentTab} index={2}>
+        <TabPanel value={activeTab} index={2}>
           <Box
             sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               mb: 3,
             }}
           >
             <Typography variant="h6">Gestion des utilisateurs</Typography>
-            <Box sx={{ display: "flex", gap: 2 }}>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
                 size="small"
                 placeholder="Rechercher..."
@@ -702,95 +734,106 @@ const AdminDashboard = () => {
             </Box>
           </Box>
 
-          <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
-            <Table>
-              <TableHead>
-                <TableRow sx={{ bgcolor: "grey.50" }}>
-                  <TableCell>
-                    <strong>Utilisateur</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Email</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Rôle</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Université</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Actualités</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Dernière activité</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Actions</strong>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {systemUsers.map((user) => (
-                  <TableRow key={user.id} hover>
+          {systemUsers.length === 0 ? (
+            <Alert severity="info">Aucun utilisateur trouvé</Alert>
+          ) : (
+            <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ bgcolor: 'grey.50' }}>
                     <TableCell>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 2 }}
-                      >
-                        <Avatar sx={{ width: 32, height: 32 }}>
-                          {user.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </Avatar>
-                        <Typography variant="body2">{user.name}</Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <Chip
-                        size="small"
-                        label={user.role}
-                        color={
-                          user.role === "admin"
-                            ? "error"
-                            : user.role === "moderator"
-                              ? "warning"
-                              : "default"
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>{user.university}</TableCell>
-                    <TableCell>
-                      <Badge badgeContent={user.news_count} color="primary">
-                        <ArticleIcon />
-                      </Badge>
+                      <strong>Utilisateur</strong>
                     </TableCell>
                     <TableCell>
-                      {new Date(user.last_active).toLocaleDateString("fr-FR")}
+                      <strong>Email</strong>
                     </TableCell>
                     <TableCell>
-                      <Box sx={{ display: "flex", gap: 1 }}>
-                        <Tooltip title="Modifier">
-                          <IconButton size="small" color="primary">
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Bloquer/Débloquer">
-                          <IconButton size="small" color="warning">
-                            <BlockIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
+                      <strong>Rôle</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Université</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Actualités</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Dernière activité</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Actions</strong>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {systemUsers.map((user) => (
+                    <TableRow key={user.id} hover>
+                      <TableCell>
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
+                        >
+                          <Avatar sx={{ width: 32, height: 32 }}>
+                            {user.first_name?.[0]}
+                            {user.last_name?.[0]}
+                          </Avatar>
+                          <Typography variant="body2">
+                            {user.first_name} {user.last_name}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        <Chip
+                          size="small"
+                          label={user.role}
+                          color={
+                            user.role === 'admin'
+                              ? 'error'
+                              : user.role === 'moderator'
+                                ? 'warning'
+                                : 'default'
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>{user.university || 'N/A'}</TableCell>
+                      <TableCell>
+                        <Badge
+                          badgeContent={user.news_count || 0}
+                          color="primary"
+                        >
+                          <ArticleIcon />
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {user.last_login
+                          ? new Date(user.last_login).toLocaleDateString(
+                              'fr-FR'
+                            )
+                          : 'Jamais'}
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Tooltip title="Modifier">
+                            <IconButton size="small" color="primary">
+                              <EditIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Bloquer/Débloquer">
+                            <IconButton size="small" color="warning">
+                              <BlockIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </TabPanel>
 
         {/* Onglet Statistiques */}
-        <TabPanel value={currentTab} index={3}>
+        <TabPanel value={activeTab} index={3}>
           <Typography variant="h6" gutterBottom>
             Statistiques avancées
           </Typography>
@@ -813,7 +856,7 @@ const AdminDashboard = () => {
                   value={75}
                   sx={{ mt: 2 }}
                 />
-                <Typography variant="caption" sx={{ mt: 1, display: "block" }}>
+                <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
                   75% d'engagement moyen
                 </Typography>
               </Paper>
@@ -843,7 +886,7 @@ const AdminDashboard = () => {
         </TabPanel>
 
         {/* Onglet Paramètres */}
-        <TabPanel value={currentTab} index={4}>
+        <TabPanel value={activeTab} index={4}>
           <Typography variant="h6" gutterBottom>
             Paramètres système
           </Typography>
@@ -894,7 +937,7 @@ const AdminDashboard = () => {
       {/* SpeedDial pour actions rapides */}
       <SpeedDial
         ariaLabel="Actions rapides admin"
-        sx={{ position: "fixed", bottom: 16, right: 16 }}
+        sx={{ position: 'fixed', bottom: 16, right: 16 }}
         icon={<SpeedDialIcon />}
       >
         {speedDialActions.map((action) => (
@@ -906,7 +949,5 @@ const AdminDashboard = () => {
         ))}
       </SpeedDial>
     </Box>
-  );
-};
-
-export default AdminDashboard;
+  )
+}

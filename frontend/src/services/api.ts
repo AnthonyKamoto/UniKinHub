@@ -266,11 +266,13 @@ export const commentAPI = {
 export const adminAPI = {
   getStats: async (): Promise<{
     total_news: number
-    pending_news: number
-    total_users: number
-    total_comments: number
+    recent_news: number
+    unread_notifications: number
+    popular_categories: any[]
+    user_role: string
+    user_university: string
   }> => {
-    const response = await api.get('/admin/stats/')
+    const response = await api.get('/dashboard/')
     return response.data
   },
 
