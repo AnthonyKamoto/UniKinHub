@@ -90,32 +90,21 @@ class _RoleSelectorState extends State<RoleSelector> {
   }
 
   Color _getRoleColor(String roleName) {
-    switch (roleName) {
-      case 'admin_global':
-        return Colors.red;
-      case 'moderateur':
-        return Colors.orange;
-      case 'enseignant':
-        return Colors.blue;
-      case 'publiant':
-        return Colors.green;
-      case 'etudiant':
-        return Colors.grey;
-      default:
-        return Colors.black87;
-    }
+    // Couleur uniforme et professionnelle pour tous les rôles
+    return Colors.grey.shade700;
   }
 
   IconData _getRoleIcon(String roleName) {
+    // Icônes spécifiques mais couleur uniforme
     switch (roleName) {
       case 'admin_global':
         return Icons.admin_panel_settings;
       case 'moderateur':
-        return Icons.gavel;
+        return Icons.verified_user;
       case 'enseignant':
         return Icons.school;
       case 'publiant':
-        return Icons.create;
+        return Icons.edit_note;
       case 'etudiant':
         return Icons.person;
       default:
@@ -195,7 +184,9 @@ class _RoleSelectorState extends State<RoleSelector> {
         labelText: 'Rôle${widget.required ? ' *' : ''}',
         hintText: 'Sélectionnez votre rôle',
         prefixIcon: const Icon(Icons.account_circle),
-        helperText: widget.selectedRoleId == null ? 'Veuillez choisir un rôle' : null,
+        helperText: widget.selectedRoleId == null
+            ? 'Veuillez choisir un rôle'
+            : null,
       ),
       hint: const Text('Choisissez un rôle'),
       items: _roles.map((role) {
