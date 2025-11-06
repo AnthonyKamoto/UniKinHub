@@ -167,6 +167,7 @@ class NewsProvider with ChangeNotifier {
     required int categoryId,
     String? imageUrl,
     String? importance,
+    String? program,
   }) async {
     _setLoading(true);
     _clearMessages();
@@ -178,6 +179,7 @@ class NewsProvider with ChangeNotifier {
         categoryId: categoryId,
         imageUrl: imageUrl,
         importance: importance,
+        program: program,
       );
 
       if (result['success']) {

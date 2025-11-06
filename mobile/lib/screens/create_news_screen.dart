@@ -16,17 +16,18 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
   final _imageUrlController = TextEditingController();
+  final _programController = TextEditingController();
 
   models.Category? _selectedCategory;
-  String _selectedImportance = 'normal';
+  String _selectedImportance = 'medium';
   bool _isLoading = false;
 
-  final List<String> _importanceOptions = ['normal', 'high', 'urgent'];
+  final List<String> _importanceOptions = ['low', 'medium', 'high'];
 
   final Map<String, String> _importanceLabels = {
-    'normal': 'Normal',
-    'high': 'Important',
-    'urgent': 'Urgent',
+    'low': '🟢 Faible - Information générale',
+    'medium': '🟡 Moyen - Important à savoir',
+    'high': '🔴 Urgent - Action requise',
   };
 
   @override
@@ -46,6 +47,7 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
     _titleController.dispose();
     _contentController.dispose();
     _imageUrlController.dispose();
+    _programController.dispose();
     super.dispose();
   }
 
@@ -75,6 +77,9 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
           ? null
           : _imageUrlController.text.trim(),
       importance: _selectedImportance,
+      program: _programController.text.trim().isEmpty
+          ? null
+          : _programController.text.trim(),
     );
 
     setState(() {
@@ -241,36 +246,18 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Importance
+                  // Niveau d'importance
                   DropdownButtonFormField<String>(
                     value: _selectedImportance,
                     decoration: const InputDecoration(
-                      labelText: 'Importance',
+                      labelText: 'Niveau d\'importance',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.priority_high),
                     ),
                     items: _importanceOptions.map((importance) {
                       return DropdownMenuItem(
                         value: importance,
-                        child: Row(
-                          children: [
-                            Icon(
-                              importance == 'urgent'
-                                  ? Icons.warning
-                                  : importance == 'high'
-                                  ? Icons.priority_high
-                                  : Icons.info,
-                              color: importance == 'urgent'
-                                  ? Colors.red
-                                  : importance == 'high'
-                                  ? Colors.orange
-                                  : Colors.blue,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(_importanceLabels[importance] ?? importance),
-                          ],
-                        ),
+                        child: Text(_importanceLabels[importance] ?? importance),
                       );
                     }).toList(),
                     onChanged: _isLoading
@@ -280,6 +267,19 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                               _selectedImportance = importance!;
                             });
                           },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Programme/Public cible
+                  TextFormField(
+                    controller: _programController,
+                    decoration: const InputDecoration(
+                      labelText: 'Programme/Public cible',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.people),
+                      hintText: 'Ex: Tous étudiants, L1 Informatique, Master Sciences...',
+                    ),
+                    enabled: !_isLoading,
                   ),
                   const SizedBox(height: 16),
 

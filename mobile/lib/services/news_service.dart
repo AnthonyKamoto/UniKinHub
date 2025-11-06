@@ -112,6 +112,7 @@ class NewsService {
     required int categoryId,
     String? imageUrl,
     String? importance,
+    String? program,
   }) async {
     try {
       final token = await _getToken();
@@ -124,6 +125,7 @@ class NewsService {
         'draft_content': content,
         'category': categoryId,
         'importance': importance ?? 'medium',
+        'programme_ou_formation': program ?? '',
         'target_universities': <String>[],
         'target_programs': <String>[],
       };
