@@ -414,12 +414,14 @@ class RoleSerializer(serializers.ModelSerializer):
     """Sérialiseur pour les rôles"""
 
     utilisateurs_count = serializers.SerializerMethodField()
+    nom_affichage = serializers.SerializerMethodField()
 
     class Meta:
         model = Role
         fields = (
             "id",
             "nom",
+            "nom_affichage",
             "description",
             "permissions",
             "est_actif",
@@ -430,6 +432,10 @@ class RoleSerializer(serializers.ModelSerializer):
 
     def get_utilisateurs_count(self, obj):
         return obj.utilisateurs.count()
+    
+    def get_nom_affichage(self, obj):
+        """Retourne le nom d'affichage complet du rôle"""
+        return obj.get_nom_display()
 
 
 class UniversiteSerializer(serializers.ModelSerializer):

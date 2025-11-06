@@ -3,6 +3,7 @@
 class Role {
   final int id;
   final String nom;
+  final String nomAffichage; // Nom d'affichage en français
   final String description;
   final Map<String, dynamic> permissions;
   final bool estActif;
@@ -12,6 +13,7 @@ class Role {
   Role({
     required this.id,
     required this.nom,
+    required this.nomAffichage,
     required this.description,
     required this.permissions,
     required this.estActif,
@@ -23,6 +25,7 @@ class Role {
     return Role(
       id: (json['id'] as num?)?.toInt() ?? 0,
       nom: (json['nom'] as String?) ?? '',
+      nomAffichage: (json['nom_affichage'] as String?) ?? (json['nom'] as String?) ?? '',
       description: (json['description'] as String?) ?? '',
       permissions: (json['permissions'] as Map<String, dynamic>?) ?? {},
       estActif: (json['est_actif'] as bool?) ?? true,
@@ -35,6 +38,7 @@ class Role {
     return {
       'id': id,
       'nom': nom,
+      'nom_affichage': nomAffichage,
       'description': description,
       'permissions': permissions,
       'est_actif': estActif,

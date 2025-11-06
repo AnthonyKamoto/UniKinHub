@@ -205,7 +205,7 @@ class _RoleSelectorState extends State<RoleSelector> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                role.nom,
+                role.nomAffichage, // Utiliser nomAffichage au lieu de nom
                 style: TextStyle(fontWeight: FontWeight.w500, color: color),
               ),
               if (role.description.isNotEmpty)
@@ -243,7 +243,7 @@ class RolePermissionsDisplay extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Permissions du rôle ${role.nom}:',
+              'Permissions du rôle ${role.nomAffichage}:', // Utiliser nomAffichage
               style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
             ),
             const SizedBox(height: 8),
