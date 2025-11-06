@@ -189,9 +189,6 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                       if (value == null || value.trim().isEmpty) {
                         return 'Titre requis';
                       }
-                      if (value.trim().length < 10) {
-                        return 'Le titre doit contenir au moins 10 caractères';
-                      }
                       return null;
                     },
                     enabled: !_isLoading,
@@ -299,9 +296,6 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Contenu requis';
-                      }
-                      if (value.trim().length < 50) {
-                        return 'Le contenu doit contenir au moins 50 caractères';
                       }
                       return null;
                     },
