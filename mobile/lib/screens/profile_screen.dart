@@ -180,6 +180,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _showChangePasswordDialog() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final formKey = GlobalKey<FormState>();
 
     final currentPasswordController = TextEditingController();
     final newPasswordController = TextEditingController();
@@ -189,33 +190,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Changer le mot de passe'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: currentPasswordController,
-              decoration: const InputDecoration(
-                labelText: 'Mot de passe actuel',
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: currentPasswordController,
+                decoration: const InputDecoration(
+                  labelText: 'Mot de passe actuel',
+                ),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Requis';
+                  }
+                  return null;
+                },
               ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: newPasswordController,
-              decoration: const InputDecoration(
-                labelText: 'Nouveau mot de passe',
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: newPasswordController,
+                decoration: const InputDecoration(
+                  labelText: 'Nouveau mot de passe',
+                  helperText: 'Min. 8 caractères, 1 maj., 1 chiffre, 1 spécial',
+                  helperMaxLines: 2,
+                ),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Requis';
+                  }
+                  if (value.length < 8) {
+                    return 'Min. 8 caractères';
+                  }
+                  if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                    return 'Min. 1 majuscule';
+                  }
+                  if (!RegExp(r'[0-9]').hasMatch(value)) {
+                    return 'Min. 1 chiffre';
+                  }
+                  if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                    return 'Min. 1 caractère spécial';
+                  }
+                  return null;
+                },
               ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: confirmPasswordController,
-              decoration: const InputDecoration(
-                labelText: 'Confirmer le nouveau mot de passe',
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: confirmPasswordController,
+                decoration: const InputDecoration(
+                  labelText: 'Confirmer le nouveau mot de passe',
+                ),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Requis';
+                  }
+                  if (value != newPasswordController.text) {
+                    return 'Mots de passe différents';
+                  }
+                  return null;
+                },
               ),
-              obscureText: true,
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -224,14 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
-              if (newPasswordController.text !=
-                  confirmPasswordController.text) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Les mots de passe ne correspondent pas'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+              if (!formKey.currentState!.validate()) {
                 return;
               }
 

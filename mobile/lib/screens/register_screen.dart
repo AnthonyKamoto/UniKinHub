@@ -353,6 +353,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     labelText: 'Mot de passe *',
                     prefixIcon: const Icon(Icons.lock),
+                    helperText:
+                        'Min. 8 caractères, 1 majuscule, 1 chiffre, 1 caractère spécial',
+                    helperMaxLines: 2,
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
@@ -375,8 +378,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Mot de passe requis';
                     }
-                    if (value.length < 6) {
-                      return 'Au moins 6 caractères requis';
+                    if (value.length < 8) {
+                      return 'Au moins 8 caractères requis';
+                    }
+                    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                      return 'Au moins une lettre majuscule requise';
+                    }
+                    if (!RegExp(r'[0-9]').hasMatch(value)) {
+                      return 'Au moins un chiffre requis';
+                    }
+                    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                      return 'Au moins un caractère spécial requis';
                     }
                     return null;
                   },
