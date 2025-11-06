@@ -221,22 +221,14 @@ class _RoleSelectorState extends State<RoleSelector> {
         Icon(icon, color: color, size: 20),
         const SizedBox(width: 12),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                role.nomAffichage, // Utiliser nomAffichage au lieu de nom
-                style: TextStyle(fontWeight: FontWeight.w500, color: color),
-              ),
-              if (role.description.isNotEmpty)
-                Text(
-                  role.description,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-            ],
+          child: Text(
+            role.nomAffichage, // Juste le nom, sans description
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: color,
+              fontSize: 14,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
