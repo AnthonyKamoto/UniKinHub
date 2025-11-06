@@ -13,6 +13,7 @@
 ## ✨ Fonctionnalités Principales
 
 ### 📱 Pour les Étudiants
+
 - 📰 **Fil d'actualités personnalisé** selon le programme d'études
 - 🔔 **Notifications push** pour les nouvelles importantes
 - ❤️ **Interactions** - Likes et commentaires
@@ -20,12 +21,14 @@
 - 📅 **Événements** avec rappels automatiques
 
 ### ✍️ Pour les Enseignants/Publiants
+
 - ✏️ **Création d'actualités** avec éditeur riche
 - 📸 **Upload d'images** et fichiers joints
 - 📊 **Statistiques** de lecture et engagement
 - 🎯 **Ciblage** par programme et université
 
 ### 🛡️ Pour les Modérateurs/Admins
+
 - ✅ **Système de modération** complet
 - 📋 **Tableau de bord** avec statistiques
 - 👥 **Gestion des utilisateurs** et rôles
@@ -45,6 +48,7 @@ UniKinHub/
 ```
 
 **Stack Technique:**
+
 - **Backend:** Django 5.2.7 + Django REST Framework + Token Authentication
 - **Frontend:** React 18 + TypeScript + Material-UI + Vite
 - **Mobile:** Flutter 3.35.6 + Provider + Material Design 3
@@ -59,6 +63,7 @@ UniKinHub/
 ## 🚀 Démarrage Rapide
 
 ### Prérequis
+
 - Python 3.12+
 - Node.js 18+ & pnpm
 - Flutter 3.35+
@@ -67,6 +72,7 @@ UniKinHub/
 ### Installation Automatique
 
 **Windows PowerShell:**
+
 ```powershell
 # 1. Cloner le repository
 git clone https://github.com/AnthonyKamoto/UniKinHub.git
@@ -77,6 +83,7 @@ cd UniKinHub
 ```
 
 Le script `setup.ps1` effectue automatiquement :
+
 - ✅ Vérification des prérequis (Python, Node.js, Flutter)
 - ✅ Création des environnements virtuels
 - ✅ Installation de toutes les dépendances
@@ -92,15 +99,17 @@ Le script `setup.ps1` effectue automatiquement :
 ```
 
 **Arrêter tous les serveurs:**
+
 ```powershell
 .\stop-all.ps1
 ```
 
 > **Accès:**
-> - 🌐 Application Web: http://localhost:3001
-> - 🔧 API Backend: http://localhost:8000/api
-> - 📱 Mobile: Via émulateur Android (http://10.0.2.2:8000)
-> - 📊 Admin Django: http://localhost:8000/admin
+>
+> - 🌐 Application Web: <http://localhost:3001>
+> - 🔧 API Backend: <http://localhost:8000/api>
+> - 📱 Mobile: Via émulateur Android (<http://10.0.2.2:8000>)
+> - 📊 Admin Django: <http://localhost:8000/admin>
 
 ---
 
@@ -136,6 +145,7 @@ Le script `setup.ps1` effectue automatiquement :
 ### Workflow de Modération
 
 1. **Connexion en tant que publiant:**
+
    ```
    Username: enseignant1
    Password: password123
@@ -147,6 +157,7 @@ Le script `setup.ps1` effectue automatiquement :
    - Soumettre → Status: `pending`
 
 3. **Connexion en tant que modérateur:**
+
    ```
    Username: moderateur1
    Password: password123
@@ -302,6 +313,7 @@ Les contributions sont les bienvenues ! Veuillez suivre ces étapes :
 ## 📝 Changelog
 
 ### Version 1.0.0 (Novembre 2025) - Version Finale
+
 - ✅ Système de modération complet (approve/reject)
 - ✅ Applications web et mobile fonctionnelles
 - ✅ Notifications email avec template HTML
@@ -328,7 +340,7 @@ Ce projet est sous licence MIT. Voir [LICENSE](LICENSE) pour plus de détails.
 ## 👨‍💻 Auteur
 
 **Anthony Kamoto**  
-📧 Email: aanthonykamoto1@gmail.com  
+📧 Email: <aanthonykamoto1@gmail.com>  
 🔗 GitHub: [@AnthonyKamoto](https://github.com/AnthonyKamoto)  
 🏢 Organisation: Fondation Children Coding Club  
 📅 Projet N°3 - Mini Projet - Novembre 2025  
@@ -347,7 +359,8 @@ Ce projet est sous licence MIT. Voir [LICENSE](LICENSE) pour plus de détails.
 ## 📞 Support
 
 Pour toute question ou problème :
-- 📧 Email: aanthonykamoto1@gmail.com
+
+- 📧 Email: <aanthonykamoto1@gmail.com>
 - 📚 Documentation: [docs/](docs/) et [DEMARRAGE_RAPIDE.md](DEMARRAGE_RAPIDE.md)
 - 🐛 Issues: [GitHub Issues](https://github.com/AnthonyKamoto/UniKinHub/issues)
 - 💬 Repository: [github.com/AnthonyKamoto/UniKinHub](https://github.com/AnthonyKamoto/UniKinHub)

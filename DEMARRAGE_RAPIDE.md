@@ -9,6 +9,7 @@
 ```
 
 Cette commande configure automatiquement tout le projet :
+
 - ✅ Création des environnements virtuels (Python, Node.js)
 - ✅ Installation des dépendances (backend, frontend, mobile)
 - ✅ Configuration de la base de données

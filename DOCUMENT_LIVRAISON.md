@@ -8,7 +8,7 @@
 |-------|--------|
 | **Nom du projet** | UniKinHub - Système de Gestion d'Actualités Universitaires |
 | **Auteur** | Anthony Kamoto |
-| **Email** | aanthonykamoto1@gmail.com |
+| **Email** | <aanthonykamoto1@gmail.com> |
 | **Organisation** | Fondation Children Coding Club |
 | **Type de projet** | Mini-Projet N°3 |
 | **Date de livraison** | 6 Novembre 2025 |
@@ -51,6 +51,7 @@ UniKinHub est une **plateforme centralisée de diffusion d'actualités universit
 ### ✨ Fonctionnalités Principales
 
 #### Pour les Étudiants
+
 - 📰 Fil d'actualités personnalisé selon le programme
 - 🔔 Notifications push pour informations importantes
 - ❤️ Interactions : likes sur les actualités
@@ -58,18 +59,21 @@ UniKinHub est une **plateforme centralisée de diffusion d'actualités universit
 - 📱 Application mobile native
 
 #### Pour les Enseignants/Publiants
+
 - ✏️ Création d'actualités avec éditeur
 - 📸 Upload d'images et fichiers joints
 - 📊 Statistiques de lecture
 - 🎯 Ciblage par programme/université
 
 #### Pour les Modérateurs
+
 - ✅ Système de modération complet
 - 📋 File d'attente des actualités
 - 💬 Commentaires de modération
 - 📈 Statistiques de modération
 
 #### Pour les Administrateurs
+
 - 👥 Gestion complète des utilisateurs
 - 🔒 Invalidation de contenu publié
 - 📊 Tableau de bord avec analytics
@@ -149,6 +153,7 @@ cd UniKinHub
 ```
 
 Le script `setup.ps1` effectue automatiquement :
+
 - ✅ Vérification des prérequis
 - ✅ Création environnement virtuel Python
 - ✅ Installation dépendances backend
@@ -161,6 +166,7 @@ Le script `setup.ps1` effectue automatiquement :
 #### Méthode 2 : Installation Manuelle
 
 **Backend Django:**
+
 ```powershell
 cd backend
 python -m venv venv
@@ -171,12 +177,14 @@ python manage.py loaddata initial_data
 ```
 
 **Frontend React:**
+
 ```powershell
 cd frontend
 pnpm install
 ```
 
 **Mobile Flutter:**
+
 ```powershell
 cd mobile
 flutter pub get
@@ -190,11 +198,13 @@ flutter pub get
 ```
 
 **Serveurs lancés:**
-- Backend Django : http://localhost:8000
-- Frontend React : http://localhost:3001
+
+- Backend Django : <http://localhost:8000>
+- Frontend React : <http://localhost:3001>
 - Mobile Flutter : Émulateur Android
 
 **Arrêter tous les serveurs:**
+
 ```powershell
 .\stop-all.ps1
 ```
@@ -219,15 +229,18 @@ flutter pub get
 ### Accès aux Interfaces
 
 **Interface Web:**
-- URL: http://localhost:3001
+
+- URL: <http://localhost:3001>
 - Login avec un des comptes ci-dessus
 
 **Application Mobile:**
+
 - Lancer depuis VS Code ou Android Studio
 - Login avec un des comptes ci-dessus
 
 **Admin Django:**
-- URL: http://localhost:8000/admin
+
+- URL: <http://localhost:8000/admin>
 - Login: `admin` / `admin123`
 
 ---
@@ -276,6 +289,7 @@ flutter pub get
 ### Test des API
 
 **Login:**
+
 ```bash
 curl -X POST http://localhost:8000/api/auth/login/ \
   -H "Content-Type: application/json" \
@@ -283,6 +297,7 @@ curl -X POST http://localhost:8000/api/auth/login/ \
 ```
 
 **Créer une actualité:**
+
 ```bash
 curl -X POST http://localhost:8000/api/news-api/ \
   -H "Authorization: Token {votre-token}" \
@@ -296,12 +311,14 @@ curl -X POST http://localhost:8000/api/news-api/ \
 ```
 
 **Lister actualités en attente:**
+
 ```bash
 curl http://localhost:8000/api/news-api/pending/ \
   -H "Authorization: Token {token-moderateur}"
 ```
 
 **Approuver une actualité:**
+
 ```bash
 curl -X POST http://localhost:8000/api/news-api/42/approve/ \
   -H "Authorization: Token {token-moderateur}" \
@@ -422,6 +439,7 @@ UniKinHub/
 ### Interface Web
 
 Les captures d'écran sont disponibles dans le dossier `screenshots/web/` :
+
 - Login / Inscription
 - Fil d'actualités
 - Création d'actualité
@@ -432,6 +450,7 @@ Les captures d'écran sont disponibles dans le dossier `screenshots/web/` :
 ### Application Mobile
 
 Les captures d'écran sont disponibles dans le dossier `screenshots/mobile/` :
+
 - Écran de connexion
 - Fil d'actualités mobile
 - Création d'actualité mobile
@@ -446,7 +465,7 @@ Les captures d'écran sont disponibles dans le dossier `screenshots/mobile/` :
 ### Informations de Contact
 
 **Auteur :** Anthony Kamoto  
-**Email :** aanthonykamoto1@gmail.com  
+**Email :** <aanthonykamoto1@gmail.com>  
 **GitHub :** [@AnthonyKamoto](https://github.com/AnthonyKamoto)  
 **Organisation :** Fondation Children Coding Club
 
@@ -455,7 +474,7 @@ Les captures d'écran sont disponibles dans le dossier `screenshots/mobile/` :
 - 📚 **Documentation** : Voir dossier `docs/` et fichiers `.md`
 - 🐛 **Issues** : [GitHub Issues](https://github.com/AnthonyKamoto/UniKinHub/issues)
 - 💬 **Repository** : [github.com/AnthonyKamoto/UniKinHub](https://github.com/AnthonyKamoto/UniKinHub)
-- 📧 **Email Support** : aanthonykamoto1@gmail.com
+- 📧 **Email Support** : <aanthonykamoto1@gmail.com>
 
 ---
 
