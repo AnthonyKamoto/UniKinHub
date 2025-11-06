@@ -75,20 +75,20 @@ class User {
       role: (json['role'] as String?) ?? 'student',
       university: (json['university'] as String?) ?? '',
       roleDisplay: (json['role_display'] as String?) ?? '',
-      // Nouveau système RBAC
-      nouveauRole: (json['nouveau_role'] as num?)?.toInt(),
+      // Nouveau système RBAC - accepte String ou num
+      nouveauRole: _parseIntField(json['nouveau_role']),
       nouveauRoleDetail: json['nouveau_role_detail'] != null
           ? Role.fromJson(json['nouveau_role_detail'])
           : null,
-      universite: (json['universite'] as num?)?.toInt(),
+      universite: _parseIntField(json['universite']),
       universiteDetail: json['universite_detail'] != null
           ? Universite.fromJson(json['universite_detail'])
           : null,
-      faculte: (json['faculte'] as num?)?.toInt(),
+      faculte: _parseIntField(json['faculte']),
       faculteDetail: json['faculte_detail'] != null
           ? Faculte.fromJson(json['faculte_detail'])
           : null,
-      departement: (json['departement'] as num?)?.toInt(),
+      departement: _parseIntField(json['departement']),
       departementDetail: json['departement_detail'] != null
           ? Departement.fromJson(json['departement_detail'])
           : null,
@@ -99,12 +99,23 @@ class User {
       isVerified: (json['is_verified'] as bool?) ?? false,
       dateJoined: _parseDateTime(json['date_joined']),
       organisationComplete: (json['organisation_complete'] as String?) ?? '',
-      verifiePar: (json['verifie_par'] as num?)?.toInt(),
+      verifiePar: _parseIntField(json['verifie_par']),
       verifieParNom: json['verifie_par_nom'] as String?,
       dateVerification: json['date_verification'] != null
           ? _parseDateTime(json['date_verification'])
           : null,
     );
+  }
+
+  static int? _parseIntField(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) {
+      final parsed = int.tryParse(value);
+      return parsed;
+    }
+    return null;
   }
 
   static DateTime _parseDateTime(dynamic dateValue) {

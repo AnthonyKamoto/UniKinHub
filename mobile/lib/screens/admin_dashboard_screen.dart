@@ -467,16 +467,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         separatorBuilder: (context, index) => const Divider(height: 1),
         itemBuilder: (context, index) {
           final category = categories[index];
+          final colorString = category['color'] as String?;
+          final color = colorString != null && colorString.isNotEmpty
+              ? Color(int.parse(colorString.replaceAll('#', '0xff')))
+              : Colors.grey;
+          
           return ListTile(
             leading: CircleAvatar(
-              backgroundColor: Color(
-                int.parse(category['color'].replaceAll('#', '0xff')),
-              ),
+              backgroundColor: color,
               radius: 16,
             ),
-            title: Text(category['name']),
+            title: Text(category['name'] ?? 'Sans nom'),
             trailing: Text(
-              '${category['news_count']} actualités',
+              '${category['news_count'] ?? 0} actualités',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           );

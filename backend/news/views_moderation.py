@@ -262,6 +262,11 @@ class NewsViewSet(viewsets.ModelViewSet):
             "moderation_comment": request.data.get("comment", "Approuvé"),
         }
 
+        print(f"DEBUG approve - News ID: {news.id}")
+        print(f"DEBUG approve - draft_title: {news.draft_title}")
+        print(f"DEBUG approve - draft_content: {news.draft_content}")
+        print(f"DEBUG approve - data: {data}")
+
         serializer = NewsModerationSerializer(
             news, data=data, context={"request": request}
         )
@@ -287,6 +292,7 @@ class NewsViewSet(viewsets.ModelViewSet):
                 {"message": "News approuvée avec succès"}, status=status.HTTP_200_OK
             )
 
+        print(f"DEBUG approve - Serializer errors: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(
