@@ -36,7 +36,8 @@ class NewsExtended {
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? moderatedAt; // Date de modération
-  final DateTime? desiredPublishStart; // Date de publication souhaitée (peut être null)
+  final DateTime?
+  desiredPublishStart; // Date de publication souhaitée (peut être null)
   final DateTime? desiredPublishEnd;
   final DateTime? publishDate; // Date effective de publication
   final DateTime? expiryDate;
