@@ -232,8 +232,8 @@ class NewsService {
 
       // action peut être 'approve' ou 'reject'
       final body = action == 'approve'
-          ? {'comment': reason ?? 'Approuvé'}
-          : {'reason': reason ?? 'Rejeté'};
+          ? {'comment': reason ?? ''}
+          : {'reason': reason ?? ''};
 
       final response = await http.post(
         Uri.parse('$baseUrl/api/news-api/$newsId/$action/'),

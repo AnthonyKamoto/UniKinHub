@@ -32,11 +32,11 @@ class NewsExtended {
   final String importance; // low, medium, high, urgent
 
   // Dates
-  final DateTime writtenAt; // Date de rédaction
+  final DateTime? writtenAt; // Date de rédaction (peut être null)
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? moderatedAt; // Date de modération
-  final DateTime desiredPublishStart; // Date de publication souhaitée
+  final DateTime? desiredPublishStart; // Date de publication souhaitée (peut être null)
   final DateTime? desiredPublishEnd;
   final DateTime? publishDate; // Date effective de publication
   final DateTime? expiryDate;
@@ -80,11 +80,11 @@ class NewsExtended {
     required this.categoryColor,
     required this.status,
     required this.importance,
-    required this.writtenAt,
+    this.writtenAt,
     required this.createdAt,
     required this.updatedAt,
     this.moderatedAt,
-    required this.desiredPublishStart,
+    this.desiredPublishStart,
     this.desiredPublishEnd,
     this.publishDate,
     this.expiryDate,
@@ -148,9 +148,9 @@ class NewsExtended {
               : '#007bff'),
       status: json['status'] ?? 'draft',
       importance: json['importance'] ?? 'medium',
-      writtenAt: DateTime.parse(
-        json['written_at'] ?? DateTime.now().toIso8601String(),
-      ),
+      writtenAt: json['written_at'] != null
+          ? DateTime.parse(json['written_at'])
+          : null,
       createdAt: DateTime.parse(
         json['created_at'] ?? DateTime.now().toIso8601String(),
       ),
@@ -160,9 +160,9 @@ class NewsExtended {
       moderatedAt: json['moderated_at'] != null
           ? DateTime.parse(json['moderated_at'])
           : null,
-      desiredPublishStart: DateTime.parse(
-        json['desired_publish_start'] ?? DateTime.now().toIso8601String(),
-      ),
+      desiredPublishStart: json['desired_publish_start'] != null
+          ? DateTime.parse(json['desired_publish_start'])
+          : null,
       desiredPublishEnd: json['desired_publish_end'] != null
           ? DateTime.parse(json['desired_publish_end'])
           : null,
@@ -207,11 +207,11 @@ class NewsExtended {
       'category_color': categoryColor,
       'status': status,
       'importance': importance,
-      'written_at': writtenAt.toIso8601String(),
+      'written_at': writtenAt?.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'moderated_at': moderatedAt?.toIso8601String(),
-      'desired_publish_start': desiredPublishStart.toIso8601String(),
+      'desired_publish_start': desiredPublishStart?.toIso8601String(),
       'desired_publish_end': desiredPublishEnd?.toIso8601String(),
       'publish_date': publishDate?.toIso8601String(),
       'expiry_date': expiryDate?.toIso8601String(),

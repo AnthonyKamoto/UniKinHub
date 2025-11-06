@@ -257,7 +257,9 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                     items: _importanceOptions.map((importance) {
                       return DropdownMenuItem(
                         value: importance,
-                        child: Text(_importanceLabels[importance] ?? importance),
+                        child: Text(
+                          _importanceLabels[importance] ?? importance,
+                        ),
                       );
                     }).toList(),
                     onChanged: _isLoading
@@ -277,7 +279,8 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                       labelText: 'Programme/Public cible',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.people),
-                      hintText: 'Ex: Tous étudiants, L1 Informatique, Master Sciences...',
+                      hintText:
+                          'Ex: Tous étudiants, L1 Informatique, Master Sciences...',
                     ),
                     enabled: !_isLoading,
                   ),
