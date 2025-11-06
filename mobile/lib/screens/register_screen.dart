@@ -93,27 +93,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text(
-                  'Inscription réussie ! Bienvenue !',
-                ),
+                content: Text('Inscription réussie ! Bienvenue !'),
                 backgroundColor: Colors.green,
                 duration: Duration(seconds: 2),
               ),
             );
             // Remplacer toute la pile de navigation pour aller à l'écran principal
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              '/home',
-              (route) => false,
-            );
+            Navigator.of(
+              context,
+            ).pushNamedAndRemoveUntil('/home', (route) => false);
           }
         } else {
           // Si la connexion automatique échoue, retourner à l'écran de connexion
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text(
-                  'Inscription réussie ! Veuillez vous connecter.',
-                ),
+                content: Text('Inscription réussie ! Veuillez vous connecter.'),
                 backgroundColor: Colors.green,
               ),
             );

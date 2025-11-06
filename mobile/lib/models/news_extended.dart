@@ -104,6 +104,26 @@ class NewsExtended {
   });
 
   factory NewsExtended.fromJson(Map<String, dynamic> json) {
+    // Gérer author qui peut être un int ou un objet
+    int authorId;
+    if (json['author'] is int) {
+      authorId = json['author'];
+    } else if (json['author'] is Map<String, dynamic>) {
+      authorId = json['author']['id'] ?? 0;
+    } else {
+      authorId = 0;
+    }
+
+    // Gérer category qui peut être un int ou un objet
+    int categoryId;
+    if (json['category'] is int) {
+      categoryId = json['category'];
+    } else if (json['category'] is Map<String, dynamic>) {
+      categoryId = json['category']['id'] ?? 0;
+    } else {
+      categoryId = 0;
+    }
+
     return NewsExtended(
       id: json['id'] ?? 0,
       programmeOuFormation: json['programme_ou_formation'] ?? '',
@@ -113,11 +133,19 @@ class NewsExtended {
       finalContent: json['final_content'] ?? '',
       title: json['title'] ?? '',
       content: json['content'] ?? '',
-      author: json['author'] ?? 0,
+      author: authorId,
       authorName: json['author_name'] ?? '',
-      category: json['category'] ?? 0,
-      categoryName: json['category_name'] ?? '',
-      categoryColor: json['category_color'] ?? '#007bff',
+      category: categoryId,
+      categoryName:
+          json['category_name'] ??
+          (json['category'] is Map<String, dynamic>
+              ? json['category']['name'] ?? ''
+              : ''),
+      categoryColor:
+          json['category_color'] ??
+          (json['category'] is Map<String, dynamic>
+              ? json['category']['color'] ?? '#007bff'
+              : '#007bff'),
       status: json['status'] ?? 'draft',
       importance: json['importance'] ?? 'medium',
       writtenAt: DateTime.parse(

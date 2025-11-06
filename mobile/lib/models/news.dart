@@ -48,15 +48,48 @@ class News {
   });
 
   factory News.fromJson(Map<String, dynamic> json) {
+    // Gérer author qui peut être un int ou un objet
+    int authorId;
+    if (json['author'] is int) {
+      authorId = json['author'];
+    } else if (json['author'] is Map<String, dynamic>) {
+      authorId = json['author']['id'] ?? 0;
+    } else {
+      authorId = 0;
+    }
+
+    // Gérer category qui peut être un int ou un objet
+    int categoryId;
+    if (json['category'] is int) {
+      categoryId = json['category'];
+    } else if (json['category'] is Map<String, dynamic>) {
+      categoryId = json['category']['id'] ?? 0;
+    } else {
+      categoryId = 0;
+    }
+
     return News(
       id: json['id'] ?? 0,
       title: json['title'] ?? '',
       content: json['content'] ?? '',
-      author: json['author'] ?? 0,
-      authorName: json['author_name'] ?? '',
-      category: json['category'] ?? 0,
-      categoryName: json['category_name'] ?? '',
-      categoryColor: json['category_color'] ?? '#007bff',
+      author: authorId,
+      authorName:
+          json['author_name'] ??
+          (json['author'] is Map<String, dynamic>
+              ? '${json['author']['first_name'] ?? ''} ${json['author']['last_name'] ?? ''}'
+                    .trim()
+              : ''),
+      category: categoryId,
+      categoryName:
+          json['category_name'] ??
+          (json['category'] is Map<String, dynamic>
+              ? json['category']['name'] ?? ''
+              : ''),
+      categoryColor:
+          json['category_color'] ??
+          (json['category'] is Map<String, dynamic>
+              ? json['category']['color'] ?? '#007bff'
+              : '#007bff'),
       status: json['status'] ?? '',
       importance: json['importance'] ?? 'medium',
       createdAt: DateTime.parse(
