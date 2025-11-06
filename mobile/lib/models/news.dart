@@ -70,28 +70,28 @@ class News {
 
     return News(
       id: json['id'] ?? 0,
-      title: json['title'] ?? '',
-      content: json['content'] ?? '',
+      title: (json['title'] as String?) ?? '',
+      content: (json['content'] as String?) ?? '',
       author: authorId,
       authorName:
-          json['author_name'] ??
+          (json['author_name'] as String?) ??
           (json['author'] is Map<String, dynamic>
               ? '${json['author']['first_name'] ?? ''} ${json['author']['last_name'] ?? ''}'
                     .trim()
               : ''),
       category: categoryId,
       categoryName:
-          json['category_name'] ??
+          (json['category_name'] as String?) ??
           (json['category'] is Map<String, dynamic>
               ? json['category']['name'] ?? ''
               : ''),
       categoryColor:
-          json['category_color'] ??
+          (json['category_color'] as String?) ??
           (json['category'] is Map<String, dynamic>
               ? json['category']['color'] ?? '#007bff'
               : '#007bff'),
-      status: json['status'] ?? '',
-      importance: json['importance'] ?? 'medium',
+      status: (json['status'] as String?) ?? '',
+      importance: (json['importance'] as String?) ?? 'medium',
       createdAt: DateTime.parse(
         json['created_at'] ?? DateTime.now().toIso8601String(),
       ),
@@ -111,7 +111,7 @@ class News {
       image: json['image'],
       attachment: json['attachment'],
       isLiked: json['is_liked'] ?? false,
-      timeSince: json['time_since'] ?? '',
+      timeSince: (json['time_since'] as String?) ?? '',
     );
   }
 

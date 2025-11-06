@@ -127,28 +127,28 @@ class NewsExtended {
 
     return NewsExtended(
       id: json['id'] ?? 0,
-      programmeOuFormation: json['programme_ou_formation'] ?? '',
-      draftTitle: json['draft_title'] ?? '',
-      draftContent: json['draft_content'] ?? '',
-      finalTitle: json['final_title'] ?? '',
-      finalContent: json['final_content'] ?? '',
-      title: json['title'] ?? '',
-      content: json['content'] ?? '',
+      programmeOuFormation: (json['programme_ou_formation'] as String?) ?? '',
+      draftTitle: (json['draft_title'] as String?) ?? '',
+      draftContent: (json['draft_content'] as String?) ?? '',
+      finalTitle: (json['final_title'] as String?) ?? '',
+      finalContent: (json['final_content'] as String?) ?? '',
+      title: (json['title'] as String?) ?? '',
+      content: (json['content'] as String?) ?? '',
       author: authorId,
-      authorName: json['author_name'] ?? '',
+      authorName: (json['author_name'] as String?) ?? '',
       category: categoryId,
       categoryName:
-          json['category_name'] ??
+          (json['category_name'] as String?) ??
           (json['category'] is Map<String, dynamic>
               ? json['category']['name'] ?? ''
               : ''),
       categoryColor:
-          json['category_color'] ??
+          (json['category_color'] as String?) ??
           (json['category'] is Map<String, dynamic>
               ? json['category']['color'] ?? '#007bff'
               : '#007bff'),
-      status: json['status'] ?? 'draft',
-      importance: json['importance'] ?? 'medium',
+      status: (json['status'] as String?) ?? 'draft',
+      importance: (json['importance'] as String?) ?? 'medium',
       writtenAt: json['written_at'] != null
           ? DateTime.parse(json['written_at'])
           : null,
@@ -175,9 +175,9 @@ class NewsExtended {
           : null,
       moderator: json['moderator'],
       moderatorApproved: json['moderator_approved'] ?? false,
-      moderationComment: json['moderation_comment'] ?? '',
+      moderationComment: (json['moderation_comment'] as String?) ?? '',
       adminInvalidatedBy: json['admin_invalidated_by'],
-      adminInvalidationReason: json['admin_invalidation_reason'] ?? '',
+      adminInvalidationReason: (json['admin_invalidation_reason'] as String?) ?? '',
       invalidatedAt: json['invalidated_at'] != null
           ? DateTime.parse(json['invalidated_at'])
           : null,
