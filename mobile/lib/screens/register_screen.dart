@@ -82,15 +82,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (success) {
       HapticFeedback.heavyImpact();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Inscription réussie ! Vous pouvez maintenant vous connecter.',
-            ),
-            backgroundColor: Colors.green,
-          ),
+        // Connexion automatique après l'inscription
+        final loginSuccess = await authProvider.login(
+          _usernameController.text.trim(),
+          _passwordController.text,
         );
-        Navigator.of(context).pop();
+
+        if (loginSuccess) {
+          // Redirection vers l'écran principal
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Inscription réussie ! Bienvenue !',
+                ),
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 2),
+              ),
+            );
+            // Remplacer toute la pile de navigation pour aller à l'écran principal
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              '/home',
+              (route) => false,
+            );
+          }
+        } else {
+          // Si la connexion automatique échoue, retourner à l'écran de connexion
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Inscription réussie ! Veuillez vous connecter.',
+                ),
+                backgroundColor: Colors.green,
+              ),
+            );
+            Navigator.of(context).pop();
+          }
+        }
       }
     } else {
       HapticFeedback.vibrate();
