@@ -471,12 +471,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
           final color = colorString != null && colorString.isNotEmpty
               ? Color(int.parse(colorString.replaceAll('#', '0xff')))
               : Colors.grey;
-          
+
           return ListTile(
-            leading: CircleAvatar(
-              backgroundColor: color,
-              radius: 16,
-            ),
+            leading: CircleAvatar(backgroundColor: color, radius: 16),
             title: Text(category['name'] ?? 'Sans nom'),
             trailing: Text(
               '${category['news_count'] ?? 0} actualités',

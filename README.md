@@ -45,12 +45,14 @@ UniKinHub/
 ```
 
 **Stack Technique:**
-- **Backend:** Django 5.2.7 + DRF + Token Auth + Celery
+- **Backend:** Django 5.2.7 + Django REST Framework + Token Authentication
 - **Frontend:** React 18 + TypeScript + Material-UI + Vite
 - **Mobile:** Flutter 3.35.6 + Provider + Material Design 3
-- **Base de données:** SQLite (dev) / PostgreSQL (prod)
-- **Notifications:** Firebase Cloud Messaging
-- **Tâches:** Celery + Redis
+- **Base de données:** SQLite (développement)
+- **Notifications:** Firebase Cloud Messaging (FCM)
+- **Tâches asynchrones:** Celery + Redis (optionnel)
+- **Authentification:** Django Token Authentication
+- **State Management:** React Context API (web) + Provider (mobile)
 
 ---
 
@@ -62,22 +64,43 @@ UniKinHub/
 - Flutter 3.35+
 - Git
 
-### Installation en une commande
+### Installation Automatique
 
 **Windows PowerShell:**
 ```powershell
+# 1. Cloner le repository
+git clone https://github.com/AnthonyKamoto/UniKinHub.git
+cd UniKinHub
+
+# 2. Setup complet (installation + configuration)
 .\setup.ps1
 ```
 
-**Démarrage de tous les serveurs:**
+Le script `setup.ps1` effectue automatiquement :
+- ✅ Vérification des prérequis (Python, Node.js, Flutter)
+- ✅ Création des environnements virtuels
+- ✅ Installation de toutes les dépendances
+- ✅ Configuration de la base de données
+- ✅ Création des données de test et comptes utilisateurs
+- ✅ Configuration Firebase (optionnel)
+
+### Démarrage des Serveurs
+
 ```powershell
+# Démarrer tous les serveurs (backend, frontend, mobile)
 .\start-all.ps1
 ```
 
+**Arrêter tous les serveurs:**
+```powershell
+.\stop-all.ps1
+```
+
 > **Accès:**
-> - 🌐 Web: http://localhost:3001
-> - 🔧 API: http://localhost:8000/api
-> - 📱 Mobile: Via émulateur Android
+> - 🌐 Application Web: http://localhost:3001
+> - 🔧 API Backend: http://localhost:8000/api
+> - 📱 Mobile: Via émulateur Android (http://10.0.2.2:8000)
+> - 📊 Admin Django: http://localhost:8000/admin
 
 ---
 
@@ -86,12 +109,10 @@ UniKinHub/
 | Guide | Description |
 |-------|-------------|
 | [📘 Installation](docs/INSTALLATION.md) | Guide d'installation détaillé |
-| [🚀 Démarrage](DEMARRAGE_RAPIDE.md) | Lancement rapide des serveurs |
-| [🔐 Authentification](docs/AUTHENTICATION.md) | Système d'auth et tokens |
-| [📡 API](docs/API.md) | Documentation API complète |
-| [🔔 Notifications](docs/NOTIFICATIONS_EMAIL.md) | Config email et push |
-| [🧪 Tests](docs/TESTING.md) | Guide de test et comptes |
-| [🏗️ Architecture](docs/ARCHITECTURE.md) | Architecture détaillée |
+| [🚀 Démarrage Rapide](DEMARRAGE_RAPIDE.md) | Lancement et configuration rapide |
+| [� Configuration SMTP](docs/SMTP_CONFIGURATION.md) | Configuration des emails |
+| [� Comptes Utilisateurs](COMPTES_UTILISATEURS.txt) | Liste complète des comptes de test |
+| [🔄 Changelog](CHANGELOG.md) | Historique des modifications |
 
 ---
 
@@ -139,25 +160,43 @@ UniKinHub/
 ### Test via API
 
 ```bash
-# Création news (enseignant1)
-curl -X POST http://localhost:8000/api/api/news-api/ \
-  -H "Authorization: Token {token}" \
+# 1. Login pour obtenir un token
+curl -X POST http://localhost:8000/api/auth/login/ \
+  -H "Content-Type: application/json" \
+  -d '{"username": "enseignant1", "password": "password123"}'
+
+# Réponse: {"token": "abc123...", "user": {...}}
+
+# 2. Création d'actualité (enseignant1)
+curl -X POST http://localhost:8000/api/news-api/ \
+  -H "Authorization: Token {votre-token}" \
   -H "Content-Type: application/json" \
   -d '{
-    "draft_title": "Test",
-    "draft_content": "Contenu",
-    "category": 1
+    "draft_title": "Nouvelle actualité test",
+    "draft_content": "Contenu de test",
+    "category": 1,
+    "importance": "medium"
   }'
 
-# Liste news en attente (admin/moderateur)
-curl http://localhost:8000/api/api/news-api/pending/ \
-  -H "Authorization: Token {token}"
+# 3. Liste des catégories
+curl http://localhost:8000/api/categories/ \
+  -H "Authorization: Token {votre-token}"
 
-# Approbation (admin/moderateur)
-curl -X POST http://localhost:8000/api/api/news-api/{id}/approve/ \
-  -H "Authorization: Token {token}" \
+# 4. Liste news en attente (admin/moderateur uniquement)
+curl http://localhost:8000/api/news-api/pending/ \
+  -H "Authorization: Token {token-moderateur}"
+
+# 5. Approbation d'actualité (admin/moderateur)
+curl -X POST http://localhost:8000/api/news-api/{id}/approve/ \
+  -H "Authorization: Token {token-moderateur}" \
   -H "Content-Type: application/json" \
-  -d '{"comment": "Approuvé"}'
+  -d '{"comment": "Approuvé sans modification"}'
+
+# 6. Rejet d'actualité
+curl -X POST http://localhost:8000/api/news-api/{id}/reject/ \
+  -H "Authorization: Token {token-moderateur}" \
+  -H "Content-Type: application/json" \
+  -d '{"reason": "Contenu inapproprié"}'
 ```
 
 ---
@@ -211,27 +250,40 @@ UniKinHub/
 
 ## 🔧 Configuration
 
-### Variables d'Environnement
+### Variables d'Environnement (Optionnel)
 
-Créer un fichier `.env` à la racine :
+Pour personnaliser la configuration, créer un fichier `.env` à la racine du backend :
 
 ```env
 # Django
-SECRET_KEY=your-secret-key
+SECRET_KEY=your-secret-key-here
 DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
+ALLOWED_HOSTS=localhost,127.0.0.1,10.0.2.2
 
-# Base de données
+# Base de données (SQLite par défaut)
 DATABASE_URL=sqlite:///db.sqlite3
 
-# Email
+# Email (Backend fichier par défaut)
 EMAIL_BACKEND=django.core.mail.backends.filebased.EmailBackend
 EMAIL_FILE_PATH=emails
 
-# Firebase (optionnel)
+# Pour utiliser un vrai serveur SMTP (optionnel)
+# EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+# EMAIL_HOST=smtp.gmail.com
+# EMAIL_PORT=587
+# EMAIL_USE_TLS=True
+# EMAIL_HOST_USER=votre-email@gmail.com
+# EMAIL_HOST_PASSWORD=votre-mot-de-passe-app
+
+# Firebase Cloud Messaging (optionnel)
 FCM_SERVER_KEY=your-firebase-server-key
 FCM_PROJECT_ID=your-project-id
+
+# Redis (optionnel - pour Celery)
+REDIS_URL=redis://localhost:6379/0
 ```
+
+> **Note:** Le projet fonctionne sans configuration `.env`. Les valeurs par défaut sont dans `settings.py`.
 
 ---
 
@@ -249,15 +301,21 @@ Les contributions sont les bienvenues ! Veuillez suivre ces étapes :
 
 ## 📝 Changelog
 
-### Version 1.0.0 (Nov 2025)
-- ✅ Système de modération complet
+### Version 1.0.0 (Novembre 2025) - Version Finale
+- ✅ Système de modération complet (approve/reject)
 - ✅ Applications web et mobile fonctionnelles
-- ✅ Notifications email et push
-- ✅ RBAC avec 4 rôles
-- ✅ Workflow de validation
-- ✅ Tests complets
+- ✅ Notifications email avec template HTML
+- ✅ Firebase Cloud Messaging pour notifications push
+- ✅ RBAC avec 4 rôles (Admin, Modérateur, Publiant, Étudiant)
+- ✅ Workflow de validation à 3 étapes
+- ✅ Dashboard d'administration (web + mobile)
+- ✅ Écran paramètres mobile avec préférences
+- ✅ API REST complète avec endpoints de modération
+- ✅ Tests complets avec données de démonstration
+- ✅ Scripts PowerShell d'automatisation (setup, start, stop)
+- ✅ Documentation complète en français
 
-Voir [CHANGELOG.md](docs/CHANGELOG.md) pour l'historique complet.
+Voir [CHANGELOG.md](CHANGELOG.md) pour l'historique complet des modifications.
 
 ---
 
@@ -271,8 +329,10 @@ Ce projet est sous licence MIT. Voir [LICENSE](LICENSE) pour plus de détails.
 
 **Anthony Kamoto**  
 📧 Email: aanthonykamoto1@gmail.com  
+🔗 GitHub: [@AnthonyKamoto](https://github.com/AnthonyKamoto)  
 🏢 Organisation: Fondation Children Coding Club  
-📅 Projet N°3 - Octobre 2025
+📅 Projet N°3 - Mini Projet - Novembre 2025  
+🎓 Formation: Développement Full-Stack (Django + React + Flutter)
 
 ---
 
@@ -288,8 +348,9 @@ Ce projet est sous licence MIT. Voir [LICENSE](LICENSE) pour plus de détails.
 
 Pour toute question ou problème :
 - 📧 Email: aanthonykamoto1@gmail.com
-- 📚 Documentation: [docs/](docs/)
+- 📚 Documentation: [docs/](docs/) et [DEMARRAGE_RAPIDE.md](DEMARRAGE_RAPIDE.md)
 - 🐛 Issues: [GitHub Issues](https://github.com/AnthonyKamoto/UniKinHub/issues)
+- 💬 Repository: [github.com/AnthonyKamoto/UniKinHub](https://github.com/AnthonyKamoto/UniKinHub)
 
 ---
 

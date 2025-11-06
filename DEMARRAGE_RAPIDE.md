@@ -1,6 +1,21 @@
 # Guide de Démarrage Rapide - UniKinHub
 
-## 🚀 Démarrage en 1 Commande
+## 🚀 Installation et Démarrage
+
+### Option 1 : Setup Automatique (Recommandé)
+
+```powershell
+.\setup.ps1
+```
+
+Cette commande configure automatiquement tout le projet :
+- ✅ Création des environnements virtuels (Python, Node.js)
+- ✅ Installation des dépendances (backend, frontend, mobile)
+- ✅ Configuration de la base de données
+- ✅ Création des données de test
+- ✅ Vérification des prérequis système
+
+### Option 2 : Démarrage Rapide (après setup)
 
 ```powershell
 .\start-all.ps1
