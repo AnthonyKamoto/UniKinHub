@@ -34,6 +34,8 @@ class _RoleSelectorState extends State<RoleSelector> {
   }
 
   Future<void> _loadRoles() async {
+    print('🔄 RoleSelector: Début du chargement des rôles...');
+    
     setState(() {
       _isLoading = true;
       _error = null;
@@ -60,18 +62,23 @@ class _RoleSelectorState extends State<RoleSelector> {
 
       print('📋 RoleSelector: ${filteredRoles.length} rôles après filtrage');
       for (var role in filteredRoles) {
-        print('  - ${role.nom} (ID: ${role.id})');
+        print('  - ${role.nomAffichage} (${role.nom}) [ID: ${role.id}]');
       }
 
-      setState(() {
-        _roles = filteredRoles;
-      });
+      if (mounted) {
+        setState(() {
+          _roles = filteredRoles;
+          _isLoading = false;
+        });
+        print('✅ RoleSelector: Rôles mis à jour dans le state');
+      }
     } catch (e) {
       print('❌ RoleSelector ERROR: $e');
-      setState(() {
-        _error = e.toString();
-      });
       if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erreur lors du chargement des rôles: $e'),
@@ -79,10 +86,6 @@ class _RoleSelectorState extends State<RoleSelector> {
           ),
         );
       }
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
@@ -166,6 +169,32 @@ class _RoleSelectorState extends State<RoleSelector> {
   }
 
   Widget _buildRoleDropdown() {
+    // Debug: afficher le nombre de rôles
+    print('🎨 RoleSelector _buildRoleDropdown: ${_roles.length} rôles disponibles');
+    
+    if (_roles.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.orange),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.warning, color: Colors.orange),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text('Aucun rôle disponible'),
+            ),
+            TextButton(
+              onPressed: _loadRoles,
+              child: const Text('Recharger'),
+            ),
+          ],
+        ),
+      );
+    }
+    
     return DropdownButtonFormField<int>(
       value: widget.selectedRoleId,
       decoration: const InputDecoration(

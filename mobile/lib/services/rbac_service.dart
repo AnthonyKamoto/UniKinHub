@@ -18,10 +18,14 @@ class RbacService {
   // Récupération du token
   static Future<List<Role>> getRoles({String? token}) async {
     try {
+      print('🌐 RbacService.getRoles: Appel API $baseUrl/roles/');
+      
       final response = await http.get(
         Uri.parse('$baseUrl/roles/'),
         headers: _getHeaders(token),
       );
+
+      print('📥 RbacService.getRoles: Status ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final decodedBody = json.decode(response.body);
@@ -30,21 +34,29 @@ class RbacService {
         List<dynamic> data;
         if (decodedBody is List) {
           data = decodedBody;
+          print('📋 Format: Liste simple avec ${data.length} éléments');
         } else if (decodedBody is Map && decodedBody.containsKey('results')) {
           data = decodedBody['results'] as List<dynamic>;
+          print('📋 Format: Paginé avec ${data.length} éléments');
         } else {
+          print('❌ Format de réponse inattendu: ${decodedBody.runtimeType}');
           throw Exception('Format de réponse inattendu');
         }
 
-        return data
+        final roles = data
             .map((json) => Role.fromJson(json as Map<String, dynamic>))
             .toList();
+        
+        print('✅ ${roles.length} rôles parsés avec succès');
+        return roles;
       } else {
+        print('❌ Erreur HTTP ${response.statusCode}: ${response.body}');
         throw Exception(
           'Erreur lors de la récupération des rôles: ${response.statusCode}',
         );
       }
     } catch (e) {
+      print('❌ Exception dans getRoles: $e');
       throw Exception('Erreur de connexion: $e');
     }
   }
