@@ -35,7 +35,7 @@ class _RoleSelectorState extends State<RoleSelector> {
 
   Future<void> _loadRoles() async {
     print('🔄 RoleSelector: Début du chargement des rôles...');
-    
+
     setState(() {
       _isLoading = true;
       _error = null;
@@ -128,12 +128,7 @@ class _RoleSelectorState extends State<RoleSelector> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Rôle${widget.required ? ' *' : ''}',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(height: 8),
-
+        // Titre supprimé car maintenant dans labelText du dropdown
         if (_isLoading)
           const LinearProgressIndicator()
         else if (_error != null)
@@ -170,8 +165,10 @@ class _RoleSelectorState extends State<RoleSelector> {
 
   Widget _buildRoleDropdown() {
     // Debug: afficher le nombre de rôles
-    print('🎨 RoleSelector _buildRoleDropdown: ${_roles.length} rôles disponibles');
-    
+    print(
+      '🎨 RoleSelector _buildRoleDropdown: ${_roles.length} rôles disponibles',
+    );
+
     if (_roles.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(16),
@@ -183,32 +180,36 @@ class _RoleSelectorState extends State<RoleSelector> {
           children: [
             const Icon(Icons.warning, color: Colors.orange),
             const SizedBox(width: 12),
-            const Expanded(
-              child: Text('Aucun rôle disponible'),
-            ),
-            TextButton(
-              onPressed: _loadRoles,
-              child: const Text('Recharger'),
-            ),
+            const Expanded(child: Text('Aucun rôle disponible')),
+            TextButton(onPressed: _loadRoles, child: const Text('Recharger')),
           ],
         ),
       );
     }
-    
+
     return DropdownButtonFormField<int>(
       value: widget.selectedRoleId,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        hintText: 'Sélectionnez un rôle',
-        prefixIcon: Icon(Icons.account_circle),
+      isExpanded: true,
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(),
+        labelText: 'Rôle${widget.required ? ' *' : ''}',
+        hintText: 'Sélectionnez votre rôle',
+        prefixIcon: const Icon(Icons.account_circle),
+        helperText: widget.selectedRoleId == null ? 'Veuillez choisir un rôle' : null,
       ),
+      hint: const Text('Choisissez un rôle'),
       items: _roles.map((role) {
         return DropdownMenuItem<int>(
           value: role.id,
           child: _buildRoleItem(role),
         );
       }).toList(),
-      onChanged: widget.onRoleChanged,
+      onChanged: (value) {
+        print('🔄 Rôle sélectionné: $value');
+        if (widget.onRoleChanged != null) {
+          widget.onRoleChanged!(value);
+        }
+      },
       validator: widget.required
           ? (value) {
               if (value == null) {

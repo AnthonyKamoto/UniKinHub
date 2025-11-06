@@ -19,7 +19,7 @@ class RbacService {
   static Future<List<Role>> getRoles({String? token}) async {
     try {
       print('🌐 RbacService.getRoles: Appel API $baseUrl/roles/');
-      
+
       final response = await http.get(
         Uri.parse('$baseUrl/roles/'),
         headers: _getHeaders(token),
@@ -46,7 +46,7 @@ class RbacService {
         final roles = data
             .map((json) => Role.fromJson(json as Map<String, dynamic>))
             .toList();
-        
+
         print('✅ ${roles.length} rôles parsés avec succès');
         return roles;
       } else {
