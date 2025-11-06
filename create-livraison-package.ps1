@@ -38,7 +38,15 @@ $excludeFolders = @(
     "staticfiles",
     "media",
     "emails",
-    ".pytest_cache"
+    ".pytest_cache",
+    "LIVRAISON_UniKinHub_*"  # Exclure les anciens packages de livraison
+)
+
+# Fichiers à exclure
+$excludeFiles = @(
+    "create-livraison-package.ps1",  # Exclure ce script lui-même
+    "*.zip",
+    "db.sqlite3"
 )
 
 # Fonction pour copier en excluant certains dossiers
@@ -47,6 +55,7 @@ function Copy-ProjectFiles {
     
     Get-ChildItem -Path $source -Recurse | ForEach-Object {
         $relativePath = $_.FullName.Substring($source.Length + 1)
+        $fileName = $_.Name
         
         # Vérifier si le chemin contient un dossier exclu
         $shouldExclude = $false
@@ -54,6 +63,16 @@ function Copy-ProjectFiles {
             if ($relativePath -match "^$exclude" -or $relativePath -match "\\$exclude\\") {
                 $shouldExclude = $true
                 break
+            }
+        }
+        
+        # Vérifier si le fichier doit être exclu
+        if (-not $shouldExclude -and -not $_.PSIsContainer) {
+            foreach ($excludeFile in $excludeFiles) {
+                if ($fileName -like $excludeFile) {
+                    $shouldExclude = $true
+                    break
+                }
             }
         }
         
