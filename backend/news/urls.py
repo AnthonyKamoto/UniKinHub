@@ -86,4 +86,20 @@ urlpatterns = [
         views.OrganisationStatsView.as_view(),
         name="organisation-stats",
     ),
+    # ===== ADMINISTRATION =====
+    path(
+        "admin/dashboard-stats/",
+        views.AdminDashboardStatsView.as_view(),
+        name="admin-dashboard-stats",
+    ),
+    path(
+        "admin/users/",
+        views.AdminUsersListView.as_view(),
+        name="admin-users",
+    ),
+    path(
+        "admin/users/<int:user_id>/",
+        views.AdminUserDetailView.as_view(),
+        name="admin-user-detail",
+    ),
 ]

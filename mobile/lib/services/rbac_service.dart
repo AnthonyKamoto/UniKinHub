@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/rbac_models.dart';
 
 class RbacService {
-  static const String baseUrl = 'http://192.168.1.198:8000/api';
+  static const String baseUrl = 'http://127.0.0.1:8000/api';
 
   static Map<String, String> _getHeaders(String? token) {
     Map<String, String> headers = {'Content-Type': 'application/json'};

@@ -7,7 +7,7 @@ import '../config/api_config_manager.dart';
 class AuthService {
   // URL dynamique - utilisera ApiConfigManager en cas de problème de connexion
   // Sinon utilise l'URL statique pour les performances
-  static const String baseUrl = 'http://192.168.1.198:8000/api';
+  static const String baseUrl = 'http://127.0.0.1:8000/api';
 
   // Méthode pour basculer vers l'URL dynamique en cas d'échec
   Future<String> _getBaseUrl() async {

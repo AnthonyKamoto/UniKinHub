@@ -177,7 +177,8 @@ class NewsExtended {
       moderatorApproved: json['moderator_approved'] ?? false,
       moderationComment: (json['moderation_comment'] as String?) ?? '',
       adminInvalidatedBy: json['admin_invalidated_by'],
-      adminInvalidationReason: (json['admin_invalidation_reason'] as String?) ?? '',
+      adminInvalidationReason:
+          (json['admin_invalidation_reason'] as String?) ?? '',
       invalidatedAt: json['invalidated_at'] != null
           ? DateTime.parse(json['invalidated_at'])
           : null,

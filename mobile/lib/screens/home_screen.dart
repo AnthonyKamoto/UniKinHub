@@ -13,6 +13,8 @@ import 'profile_screen.dart';
 import 'advanced_filter_screen.dart';
 import 'notification_preferences_screen.dart';
 import 'login_screen.dart';
+import 'admin_dashboard_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -688,7 +690,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: const Text('Administration'),
                         onTap: () {
                           Navigator.pop(context);
-                          _showComingSoon('Administration');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const AdminDashboardScreen(),
+                            ),
+                          );
                         },
                       ),
                     const Divider(),
@@ -724,7 +732,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: const Text('Paramètres'),
                       onTap: () {
                         Navigator.pop(context);
-                        _showComingSoon('Paramètres');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SettingsScreen(),
+                          ),
+                        );
                       },
                     ),
                     const Divider(),
@@ -746,15 +759,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
       },
-    );
-  }
-
-  void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$feature - Fonctionnalité à venir'),
-        backgroundColor: Colors.orange,
-      ),
     );
   }
 

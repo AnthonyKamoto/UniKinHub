@@ -13,11 +13,11 @@ class ApiConfig {
   // Utilise l'adresse IP réelle du PC pour fonctionner sur émulateur ET appareil physique
 
   /// Adresse IP du PC (fonctionne pour émulateur Android et appareil physique)
-  static const String baseUrl = 'http://192.168.1.198:8000/api';
+  static const String baseUrl = 'http://127.0.0.1:8000/api';
 
   /// Alternatives (commentées) :
   // static const String baseUrl = 'http://10.0.2.2:8000/api';      // Émulateur Android uniquement
-  // static const String baseUrl = 'http://127.0.0.1:8000/api';     // iOS Simulator
+  // static const String baseUrl = 'http://192.168.1.198:8000/api'; // Réseau local (appareil physique)
 
   // Timeout des requêtes HTTP (en secondes)
   static const Duration timeout = Duration(seconds: 30);

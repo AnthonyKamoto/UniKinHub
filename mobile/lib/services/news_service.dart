@@ -5,7 +5,7 @@ import '../models/news.dart';
 import '../models/category.dart';
 
 class NewsService {
-  static const String baseUrl = 'http://192.168.1.198:8000/api';
+  static const String baseUrl = 'http://127.0.0.1:8000/api';
 
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();

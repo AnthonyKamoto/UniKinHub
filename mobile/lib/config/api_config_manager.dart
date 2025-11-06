@@ -10,9 +10,9 @@ class ApiConfigManager {
 
   // Liste des adresses à tester (par ordre de priorité)
   static final List<String> _candidateAddresses = [
-    '192.168.1.198', // IP actuelle détectée
+    '127.0.0.1', // Localhost (développement)
     '10.0.2.2', // Émulateur Android
-    '127.0.0.1', // iOS Simulator
+    '192.168.1.198', // Réseau local (appareil physique)
     'localhost', // Alternative locale
   ];
 
@@ -49,7 +49,7 @@ class ApiConfigManager {
     }
 
     // Fallback sur l'adresse par défaut
-    final fallbackUrl = 'http://192.168.1.198:$_port/api';
+    final fallbackUrl = 'http://127.0.0.1:$_port/api';
     _cachedBaseUrl = fallbackUrl;
     return fallbackUrl;
   }

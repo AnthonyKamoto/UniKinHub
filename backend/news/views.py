@@ -882,3 +882,137 @@ def unregister_fcm_token(request):
     request.user.save()
 
     return Response({"message": "Token FCM supprimé avec succès"})
+
+
+# ===== VUES ADMINISTRATION =====
+
+
+class AdminDashboardStatsView(APIView):
+    """API pour les statistiques du tableau de bord administrateur"""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Vérifier que l'utilisateur est admin
+        if request.user.role not in ["admin_global", "admin"]:
+            return Response(
+                {"error": "Accès non autorisé"}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Statistiques générales
+        total_users = User.objects.count()
+        total_news = News.objects.count()
+        pending_news = News.objects.filter(status="pending").count()
+        active_categories = Category.objects.annotate(
+            news_count=Count("news", filter=Q(news__status="published"))
+        ).filter(news_count__gt=0).count()
+
+        # Catégories populaires
+        popular_categories = (
+            Category.objects.annotate(
+                news_count=Count("news", filter=Q(news__status="published"))
+            )
+            .filter(news_count__gt=0)
+            .order_by("-news_count")[:5]
+            .values("id", "name", "news_count")
+        )
+
+        return Response(
+            {
+                "total_users": total_users,
+                "total_news": total_news,
+                "pending_news": pending_news,
+                "active_categories": active_categories,
+                "popular_categories": list(popular_categories),
+            }
+        )
+
+
+class AdminUsersListView(APIView):
+    """API pour lister tous les utilisateurs (admin)"""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Vérifier que l'utilisateur est admin
+        if request.user.role not in ["admin_global", "admin"]:
+            return Response(
+                {"error": "Accès non autorisé"}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        users = User.objects.all().select_related("universite", "faculte", "departement")
+        
+        users_data = []
+        for user in users:
+            users_data.append({
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "role": user.role,
+                "promotion": user.promotion,
+                "is_active": user.is_active,
+                "date_joined": user.date_joined,
+                "universite": user.universite.nom if user.universite else None,
+                "faculte": user.faculte.nom if user.faculte else None,
+                "departement": user.departement.nom if user.departement else None,
+            })
+
+        return Response(users_data)
+
+
+class AdminUserDetailView(APIView):
+    """API pour gérer un utilisateur spécifique (admin)"""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        # Vérifier que l'utilisateur est admin
+        if request.user.role not in ["admin_global", "admin"]:
+            return Response(
+                {"error": "Accès non autorisé"}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        try:
+            user = User.objects.get(id=user_id)
+            user_data = {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "role": user.role,
+                "promotion": user.promotion,
+                "is_active": user.is_active,
+                "date_joined": user.date_joined,
+            }
+            return Response(user_data)
+        except User.DoesNotExist:
+            return Response(
+                {"error": "Utilisateur non trouvé"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+    def patch(self, request, user_id):
+        # Vérifier que l'utilisateur est admin
+        if request.user.role not in ["admin_global", "admin"]:
+            return Response(
+                {"error": "Accès non autorisé"}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        try:
+            user = User.objects.get(id=user_id)
+            
+            # Mettre à jour les champs autorisés
+            allowed_fields = ["first_name", "last_name", "email", "role", "promotion", "is_active"]
+            for field in allowed_fields:
+                if field in request.data:
+                    setattr(user, field, request.data[field])
+            
+            user.save()
+            
+            return Response({"message": "Utilisateur mis à jour avec succès"})
+        except User.DoesNotExist:
+            return Response(
+                {"error": "Utilisateur non trouvé"}, status=status.HTTP_404_NOT_FOUND
+            )
